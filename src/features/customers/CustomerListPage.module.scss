@@ -1,0 +1,28 @@
+.customerPageContainer {
+  background: #f8f9fa;
+  min-height: 80vh;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+  padding: 2rem 1.5rem;
+}
+
+.customerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.customerTitle {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #0d6efd;
+  margin: 0;
+}
+
+.addCustomerBtn {
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 0.5rem 1.2rem;
+  border-radius: 6px;
+} 

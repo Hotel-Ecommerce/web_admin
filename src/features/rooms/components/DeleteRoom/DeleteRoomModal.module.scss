@@ -1,0 +1,21 @@
+.delete-room-modal {
+  .modal-header {
+    background: #f8d7da;
+    color: #721c24;
+  }
+  .modal-body {
+    font-size: 1.1rem;
+    color: #333;
+    p {
+      margin-bottom: 0.5rem;
+    }
+    strong {
+      color: #c82333;
+    }
+  }
+  .modal-footer {
+    button {
+      min-width: 80px;
+    }
+  }
+}

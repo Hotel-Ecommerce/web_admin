@@ -1,0 +1,16 @@
+.employee-detail-modal {
+  .modal-header {
+    background: #e3f2fd;
+    color: #1565c0;
+  }
+  .modal-body {
+    font-size: 1.1rem;
+    color: #333;
+    p {
+      margin-bottom: 0.5rem;
+    }
+    strong {
+      color: #1565c0;
+    }
+  }
+}

@@ -1,0 +1,25 @@
+.dashboardPageContainer {
+  background: #f8f9fa;
+  min-height: 80vh;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+  padding: 2rem 1.5rem;
+}
+
+.dashboardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.dashboardTitle {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #0d6efd;
+  margin: 0;
+}
+
+.dashboardChart {
+  margin-top: 2rem;
+} 
