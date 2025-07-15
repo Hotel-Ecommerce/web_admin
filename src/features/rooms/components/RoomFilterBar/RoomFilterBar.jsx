@@ -10,6 +10,7 @@ const RoomFilterBar = ({ search, setSearch }) => (
         placeholder="Tìm kiếm theo số phòng, loại phòng, mô tả..."
         value={search}
         onChange={e => setSearch(e.target.value)}
+        style={{ background: '#fff', color: '#1C1C1E', border: '1.5px solid #e9ecef', borderRadius: 8 }}
       />
     </Col>
   </Row>

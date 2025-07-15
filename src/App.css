@@ -36,3 +36,14 @@
     transform: rotate(360deg);
   }
 }
+
+input.form-control, select.form-select {
+  border: 1.5px solid #bdbdbd !important;
+  border-radius: 6px;
+  box-shadow: none;
+  transition: border-color 0.2s;
+}
+input.form-control:focus, select.form-select:focus {
+  border-color: #0d6efd;
+  outline: none;
+}

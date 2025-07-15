@@ -39,23 +39,25 @@ const StatisticsPage = () => {
       <Form onSubmit={handleFetch} className={styles.statisticsFilterBar}>
         <Row className="align-items-end">
           <Col md={3}>
-            <Form.Label>Từ ngày</Form.Label>
-            <Form.Control type="date" value={startDate} onChange={e => setStartDate(e.target.value)} required />
+            <Form.Label style={{color:'#1C1C1E'}}>Từ ngày</Form.Label>
+            <Form.Control type="date" value={startDate} onChange={e => setStartDate(e.target.value)} required style={{ background: '#fff', color: '#1C1C1E', border: '1.5px solid #e9ecef', borderRadius: 8 }} />
           </Col>
           <Col md={3}>
-            <Form.Label>Đến ngày</Form.Label>
-            <Form.Control type="date" value={endDate} onChange={e => setEndDate(e.target.value)} required />
+            <Form.Label style={{color:'#1C1C1E'}}>Đến ngày</Form.Label>
+            <Form.Control type="date" value={endDate} onChange={e => setEndDate(e.target.value)} required style={{ background: '#fff', color: '#1C1C1E', border: '1.5px solid #e9ecef', borderRadius: 8 }} />
           </Col>
           <Col md={3}>
-            <Form.Label>Nhóm theo</Form.Label>
-            <Form.Select value={groupBy} onChange={e => setGroupBy(e.target.value)}>
+            <Form.Label style={{color:'#1C1C1E'}}>Nhóm theo</Form.Label>
+            <Form.Select value={groupBy} onChange={e => setGroupBy(e.target.value)} style={{ background: '#fff', color: '#1C1C1E', border: '1.5px solid #e9ecef', borderRadius: 8 }}>
               <option value="day">Ngày</option>
               <option value="month">Tháng</option>
               <option value="year">Năm</option>
             </Form.Select>
           </Col>
           <Col md={3} className="text-end">
-            <Button type="submit" variant="primary">Lấy thống kê</Button>
+            <Button type="submit" style={{background:'#00AEEF', color:'#fff', border:'none', borderRadius: 6, fontWeight: 500, fontSize: '1rem', padding: '0.5rem 1.2rem', transition: 'background 0.2s'}} onMouseOver={e => e.currentTarget.style.background = '#0095c8'} onMouseOut={e => e.currentTarget.style.background = '#00AEEF'}>
+              Lấy thống kê
+            </Button>
           </Col>
         </Row>
       </Form>
@@ -72,25 +74,25 @@ const StatisticsPage = () => {
                 <YAxis allowDecimals={false} />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="totalBookings" fill="#8884d8" name="Tổng đặt phòng" />
-                <Bar dataKey="confirmedBookings" fill="#82ca9d" name="Đã xác nhận" />
+                <Bar dataKey="totalBookings" fill="#00AEEF" name="Tổng đặt phòng" />
+                <Bar dataKey="confirmedBookings" fill="#28a745" name="Đã xác nhận" />
               </BarChart>
             </ResponsiveContainer>
-            <h5 className="mt-4">Bảng số liệu</h5>
-            <Table striped bordered hover responsive>
+            <h5 className="mt-4" style={{color:'#1C1C1E', fontWeight:600}}>Bảng số liệu</h5>
+            <Table striped bordered hover responsive style={{background:'#fff', border:'1px solid #e9ecef', borderRadius:8}}>
               <thead>
-                <tr>
-                  <th>Ngày</th>
-                  <th>Tổng đặt phòng</th>
-                  <th>Đã xác nhận</th>
+                <tr style={{background:'#F7F9FC'}}>
+                  <th style={{color:'#1C1C1E', fontWeight:600}}>Ngày</th>
+                  <th style={{color:'#1C1C1E', fontWeight:600}}>Tổng đặt phòng</th>
+                  <th style={{color:'#1C1C1E', fontWeight:600}}>Đã xác nhận</th>
                 </tr>
               </thead>
               <tbody>
                 {chartData.map((row, idx) => (
                   <tr key={idx}>
-                    <td>{row.date}</td>
-                    <td>{row.totalBookings}</td>
-                    <td>{row.confirmedBookings}</td>
+                    <td style={{color:'#1C1C1E'}}>{row.date}</td>
+                    <td style={{color:'#1C1C1E'}}>{row.totalBookings}</td>
+                    <td style={{color:'#1C1C1E'}}>{row.confirmedBookings}</td>
                   </tr>
                 ))}
               </tbody>

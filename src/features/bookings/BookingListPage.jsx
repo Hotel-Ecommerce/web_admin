@@ -125,29 +125,9 @@ const BookingListPage = () => {
       accessor: 'actions',
       cell: (row) => (
         <>
-          <Button 
-            variant="outline-info" 
-            size="sm" 
-            onClick={() => handleViewDetail(row)} 
-            className="me-2"
-          >
-            👁️ Xem
-          </Button>
-          <Button 
-            variant="outline-primary" 
-            size="sm" 
-            onClick={() => handleEdit(row)} 
-            className="me-2"
-          >
-            ✏️ Sửa
-          </Button>
-          <Button 
-            variant="outline-danger" 
-            size="sm" 
-            onClick={() => handleDelete(row)}
-          >
-            🗑️ Xóa
-          </Button>
+          <Button style={{background:'#00AEEF', border:'none', color:'#fff'}} size="sm" className="me-2" onClick={() => handleViewDetail(row)}>👁️ Xem</Button>
+          <Button style={{background:'#ffc107', border:'none', color:'#1C1C1E'}} size="sm" className="me-2" onClick={() => handleEdit(row)}>✏️ Sửa</Button>
+          <Button style={{background:'#dc3545', border:'none', color:'#fff'}} size="sm" onClick={() => handleDelete(row)}>🗑️ Xóa</Button>
         </>
       )
     }
@@ -163,58 +143,63 @@ const BookingListPage = () => {
       </div>
 
       {/* Filters */}
-      <Row className="mb-4">
+      <Row className={`mb-4 ${styles.filterRow}`}>
         <Col md={12}>
           <Form className="bg-light p-3 rounded">
             <Row>
               <Col md={2}>
                 <Form.Group>
-                  <Form.Label>ID Khách hàng</Form.Label>
+                  <Form.Label style={{color:'#1C1C1E'}}>ID Khách hàng</Form.Label>
                   <Form.Control
                     type="text"
                     value={filters.customerId}
                     onChange={(e) => handleFilterChange('customerId', e.target.value)}
                     placeholder="Nhập ID khách hàng"
+                    style={{ background: '#fff', color: '#1C1C1E', border: '1.5px solid #e9ecef', borderRadius: 8 }}
                   />
                 </Form.Group>
               </Col>
               <Col md={2}>
                 <Form.Group>
-                  <Form.Label>ID Phòng</Form.Label>
+                  <Form.Label style={{color:'#1C1C1E'}}>ID Phòng</Form.Label>
                   <Form.Control
                     type="text"
                     value={filters.roomId}
                     onChange={(e) => handleFilterChange('roomId', e.target.value)}
                     placeholder="Nhập ID phòng"
+                    style={{ background: '#fff', color: '#1C1C1E', border: '1.5px solid #e9ecef', borderRadius: 8 }}
                   />
                 </Form.Group>
               </Col>
               <Col md={2}>
                 <Form.Group>
-                  <Form.Label>Từ ngày</Form.Label>
+                  <Form.Label style={{color:'#1C1C1E'}}>Từ ngày</Form.Label>
                   <Form.Control
                     type="date"
                     value={filters.checkInDate}
                     onChange={(e) => handleFilterChange('checkInDate', e.target.value)}
+                    style={{ background: '#fff', color: '#1C1C1E', border: '1.5px solid #e9ecef', borderRadius: 8 }}
                   />
                 </Form.Group>
               </Col>
               <Col md={2}>
                 <Form.Group>
-                  <Form.Label>Đến ngày</Form.Label>
+                  <Form.Label style={{color:'#1C1C1E'}}>Đến ngày</Form.Label>
                   <Form.Control
                     type="date"
                     value={filters.checkOutDate}
                     onChange={(e) => handleFilterChange('checkOutDate', e.target.value)}
+                    style={{ background: '#fff', color: '#1C1C1E', border: '1.5px solid #e9ecef', borderRadius: 8 }}
                   />
                 </Form.Group>
               </Col>
-              <Col md={2}>
+              <Col md={3}>
                 <Form.Group>
-                  <Form.Label>Trạng thái thanh toán</Form.Label>
+                  <Form.Label style={{color:'#1C1C1E'}}>Trạng thái thanh toán</Form.Label>
                   <Form.Select
                     value={filters.paymentStatus}
                     onChange={(e) => handleFilterChange('paymentStatus', e.target.value)}
+                    style={{ background: '#fff', color: '#1C1C1E', border: '1.5px solid #e9ecef', borderRadius: 8 }}
                   >
                     <option value="">Tất cả</option>
                     <option value="PENDING">Chờ thanh toán</option>
@@ -223,9 +208,9 @@ const BookingListPage = () => {
                   </Form.Select>
                 </Form.Group>
               </Col>
-              <Col md={2} className="d-flex align-items-end">
+              <Col md={2} className={styles.filterBtnCol}>
                 <Button 
-                  variant="outline-secondary" 
+                  style={{background:'#e9ecef', color:'#1C1C1E', border:'none'}} 
                   onClick={() => setFilters({
                     page: 0,
                     size: 20,
@@ -235,6 +220,7 @@ const BookingListPage = () => {
                     checkOutDate: '',
                     paymentStatus: ''
                   })}
+                  className="w-100"
                 >
                   Xóa bộ lọc
                 </Button>
@@ -269,12 +255,12 @@ const BookingListPage = () => {
       {!loading && bookings.length > 0 && (
         <Row className="mt-3">
           <Col className="d-flex justify-content-between align-items-center">
-            <div>
+            <div style={{color:'#6C757D'}}>
               Trang {filters.page + 1} - Hiển thị {bookings.length} kết quả
             </div>
             <div>
               <Button
-                variant="outline-primary"
+                style={{background:'#fff', color:'#1C1C1E', border:'1px solid #e9ecef', borderRadius: 6}}
                 disabled={filters.page === 0}
                 onClick={() => handlePageChange(filters.page - 1)}
                 className="me-2"
@@ -282,7 +268,7 @@ const BookingListPage = () => {
                 Trước
               </Button>
               <Button
-                variant="outline-primary"
+                style={{background:'#fff', color:'#1C1C1E', border:'1px solid #e9ecef', borderRadius: 6}}
                 disabled={bookings.length < filters.size}
                 onClick={() => handlePageChange(filters.page + 1)}
               >

@@ -113,9 +113,9 @@ const CustomerListPage = () => {
       accessor: 'actions',
       cell: (row) => (
         <>
-          <Button variant="outline-primary" size="sm" className="me-2" onClick={() => handleViewDetail(row._id)}>👁 Xem</Button>
-          <Button variant="outline-warning" size="sm" className="me-2" onClick={() => { setSelectedCustomer(row); setShowUpdate(true); }}>✏ Sửa</Button>
-          <Button variant="outline-danger" size="sm" onClick={() => { setSelectedCustomer(row); setShowDelete(true); }}>🗑 Xoá</Button>
+          <Button style={{background:'#00AEEF', border:'none', color:'#fff'}} size="sm" className="me-2" onClick={() => handleViewDetail(row._id)}>👁 Xem</Button>
+          <Button style={{background:'#ffc107', border:'none', color:'#1C1C1E'}} size="sm" className="me-2" onClick={() => { setSelectedCustomer(row); setShowUpdate(true); }}>✏ Sửa</Button>
+          <Button style={{background:'#dc3545', border:'none', color:'#fff'}} size="sm" onClick={() => { setSelectedCustomer(row); setShowDelete(true); }}>🗑 Xoá</Button>
         </>
       )
     }
@@ -146,16 +146,20 @@ const CustomerListPage = () => {
             placeholder="Tìm kiếm theo tên, email, số điện thoại..."
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(0); }}
-            style={{ display: 'inline-block', width: '70%' }}
+            style={{ display: 'inline-block', width: '70%', background: '#fff', color: '#1C1C1E', border: '1.5px solid #e9ecef', borderRadius: 8 }}
           />
         </Col>
       </Row>
-      <TableWrapper columns={columns} data={customers} loading={loading} />
-      <Row className="mt-3">
-        <Col>
-          <Pagination>{paginationItems}</Pagination>
-        </Col>
-      </Row>
+      <TableWrapper columns={columns} data={customers} loading={loading} className="customer-table" />
+      {customers.length > 0 && (
+        <Row className="mt-3">
+          <Col>
+            <Pagination>
+              {paginationItems.map((item, idx) => React.cloneElement(item, { style: { background: '#fff', color: '#1C1C1E', border: '1px solid #e9ecef', borderRadius: 6, margin: '0 2px' } }))}
+            </Pagination>
+          </Col>
+        </Row>
+      )}
       <CustomerDetailModal
         show={showDetail}
         onHide={() => setShowDetail(false)}

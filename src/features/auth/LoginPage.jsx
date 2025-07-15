@@ -1,27 +1,29 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, Container, Row, Col, Card, Alert } from 'react-bootstrap';
+import { login } from './AuthAPI';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // ⚠️ Gọi API thật nếu bạn có, ở đây chỉ giả lập
-    if (email === 'admin@gmail.com' && password === '123456') {
-      const fakeUser = {
-        email,
-        token: 'fake-jwt-token',
-        role: 'Manager'
-      };
-      localStorage.setItem('user', JSON.stringify(fakeUser));
+    setError('');
+    setLoading(true);
+    try {
+      const data = await login(email, password);
+      // Giả định backend trả về { token, user: { ... } }
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user || {}));
       navigate('/dashboard');
-    } else {
-      setError('Email hoặc mật khẩu không đúng!');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Đăng nhập thất bại!');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -56,8 +58,8 @@ const LoginPage = () => {
                   />
                 </Form.Group>
 
-                <Button type="submit" className="w-100" variant="primary">
-                  Đăng nhập
+                <Button type="submit" className="w-100" variant="primary" disabled={loading}>
+                  {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
                 </Button>
               </Form>
             </Card.Body>

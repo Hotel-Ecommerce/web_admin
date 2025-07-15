@@ -17,9 +17,7 @@ const Sidebar = () => {
 
   return (
     <nav className={styles.sidebar}>
-      <div className="mb-4">
-        <h5 className="text-center">Menu</h5>
-      </div>
+      <div className={styles.logo}>HOTEL</div>
       <Nav className="flex-column">
         {menuItems.map((item) => (
           <Nav.Link

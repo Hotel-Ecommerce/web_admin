@@ -1,25 +1,124 @@
-.dashboardPageContainer {
-  background: #f8f9fa;
-  min-height: 80vh;
-  border-radius: 12px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
-  padding: 2rem 1.5rem;
-}
-
-.dashboardHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
+.dashboardWrap {
+  padding: 2.5rem 2.5rem 2rem 2.5rem;
+  background: #F7F9FC;
+  min-height: 100vh;
 }
 
 .dashboardTitle {
-  font-size: 2rem;
-  font-weight: 600;
-  color: #0d6efd;
-  margin: 0;
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: #1C1C1E;
+  margin-bottom: 2.2rem;
+  letter-spacing: 0.5px;
 }
 
-.dashboardChart {
-  margin-top: 2rem;
+.statsRow {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+}
+
+.statCard {
+  flex: 1;
+  background: #1E2A38;
+  color: #fff;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.2rem 1.2rem 1.5rem 1.2rem;
+  box-shadow: 0 2px 16px rgba(30,42,56,0.08);
+  min-width: 160px;
+}
+.statIcon {
+  font-size: 2.2rem;
+  margin-bottom: 0.7rem;
+}
+.statValue {
+  font-size: 2.1rem;
+  font-weight: 800;
+  margin-bottom: 0.2rem;
+}
+.statLabel {
+  font-size: 1.1rem;
+  color: #e0f7fa;
+  font-weight: 500;
+}
+
+.gridRow {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+}
+
+.roomStatusCard, .occupancyCard, .reservationsCard {
+  border-radius: 18px !important;
+  box-shadow: 0 2px 16px rgba(30,42,56,0.08);
+  background: #fff !important;
+  flex: 1;
+  padding: 1.5rem 1.5rem 1.2rem 1.5rem;
+  min-width: 0;
+}
+.cardTitle {
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: #1C1C1E;
+  margin-bottom: 1.2rem;
+}
+.roomStatusGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 1.2rem;
+}
+.roomBox {
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: #fff;
+  background: #17c3b2;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  box-shadow: 0 1px 6px rgba(30,42,56,0.07);
+}
+.statusLegend {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  color: #6C757D;
+  align-items: center;
+}
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.legendDot {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.reservationsCard {
+  min-width: 260px;
+  max-width: 340px;
+}
+.reservationsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+.reservationRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.08rem;
+  color: #1C1C1E;
+  font-weight: 500;
+}
+.occupancyCard {
+  min-width: 340px;
 } 

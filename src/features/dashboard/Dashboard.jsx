@@ -1,83 +1,131 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Card, Spinner } from 'react-bootstrap';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
-import { getBookingStatistics } from '../statistics/StatisticsAPI';
+import { Card, Spinner, Alert } from 'react-bootstrap';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import styles from './Dashboard.module.scss';
+import { getDashboardSummary } from './DashboardAPI';
 
 const Dashboard = () => {
-  const stats = [
-    { title: 'Khách hàng', count: 128, variant: 'primary' },
-    { title: 'Phòng đang trống', count: 42, variant: 'success' },
-    { title: 'Đơn đặt phòng', count: 87, variant: 'warning' },
-    { title: 'Hoá đơn hôm nay', count: 15, variant: 'danger' },
-  ];
-
-  // State cho biểu đồ booking statistics
-  const [chartData, setChartData] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchData = async () => {
       setLoading(true);
+      setError('');
       try {
-        // Lấy 7 ngày gần nhất
-        const end = new Date();
-        const start = new Date();
-        start.setDate(end.getDate() - 6);
-        const params = {
-          startDate: start.toISOString().slice(0, 10),
-          endDate: end.toISOString().slice(0, 10),
-          groupBy: 'day',
-        };
-        const data = await getBookingStatistics(params);
-        setChartData(Array.isArray(data) ? data : [data]);
-      } catch {
-        setChartData([]);
+        const data = await getDashboardSummary();
+        setSummary(data);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Không thể tải dữ liệu dashboard!');
       } finally {
         setLoading(false);
       }
     };
-    fetchStats();
+    fetchData();
   }, []);
 
+  const statCards = summary ? [
+    { icon: '🛏️', value: summary.occupancyRate ? `${summary.occupancyRate}%` : '0%', label: 'Tỉ lệ lấp đầy', color: '#1E2A38' },
+    { icon: '✅', value: summary.checkInCount || 0, label: 'Nhận phòng', color: '#00AEEF' },
+    { icon: '➡️', value: summary.checkOutCount || 0, label: 'Trả phòng', color: '#ffc107', textColor: '#1C1C1E' },
+    { icon: '₫', value: summary.revenue ? summary.revenue.toLocaleString() : '0', label: 'Doanh thu', color: '#28a745' },
+  ] : [];
+
+  const statusLegend = [
+    { label: 'Đang có khách', color: '#28a745' },
+    { label: 'Sắp trả', color: '#ffc107' },
+    { label: 'Đang dọn', color: '#dc3545' },
+  ];
+
+  const roomBoxes = (summary?.roomStatus || []).map((room, idx) => ({
+    number: room.number || room.name || room._id || idx,
+    status: room.status,
+    color:
+      room.status === 'occupied' ? '#28a745' :
+      room.status === 'dueout' ? '#ffc107' :
+      room.status === 'cleaning' ? '#dc3545' : '#e0e0e0',
+  }));
+
+  const recentBookings = summary?.recentBookings || [];
+  const chartData = summary?.chartData || [];
+
   return (
-    <Container fluid className={styles.dashboardPageContainer}>
-      <div className={styles.dashboardHeader}>
-        <h2 className={styles.dashboardTitle}>Thống kê tổng quan</h2>
-      </div>
-      <Row>
-        {stats.map((item, index) => (
-          <Col md={3} sm={6} xs={12} key={index} className="mb-4">
-            <Card bg={item.variant.toLowerCase()} text="white">
-              <Card.Body>
-                <Card.Title className="fs-5">{item.title}</Card.Title>
-                <Card.Text className="fs-3 fw-bold">{item.count}</Card.Text>
-              </Card.Body>
+    <div className={styles.dashboardWrap}>
+      <h1 className={styles.dashboardTitle}>Bảng điều khiển</h1>
+      {loading && <div className="text-center my-4"><Spinner animation="border" /></div>}
+      {error && <Alert variant="danger">{error}</Alert>}
+      {!loading && !error && summary && (
+        <>
+          <div className={styles.statsRow}>
+            {statCards.map((item, idx) => (
+              <div className={styles.statCard} key={idx} style={{ background: item.color, color: item.textColor || '#fff' }}>
+                <div className={styles.statIcon}>{item.icon}</div>
+                <div className={styles.statValue}>{item.value}</div>
+                <div className={styles.statLabel}>{item.label}</div>
+              </div>
+            ))}
+          </div>
+          <div className={styles.gridRow}>
+            <Card className={styles.roomStatusCard}>
+              <div className={styles.cardTitle}>Trạng thái phòng</div>
+              <div className={styles.roomStatusGrid}>
+                {roomBoxes.map((room, idx) => (
+                  <div key={idx} className={styles.roomBox} style={{ background: room.color }}>
+                    {room.number}
+                  </div>
+                ))}
+              </div>
+              <div className={styles.statusLegend}>
+                {statusLegend.map((s, idx) => (
+                  <span key={idx} className={styles.legendItem}>
+                    <span className={styles.legendDot} style={{ background: s.color }}></span>
+                    {s.label}
+                  </span>
+                ))}
+              </div>
             </Card>
-          </Col>
-        ))}
-      </Row>
-      <Row className={styles.dashboardChart}>
-        <Col md={12}>
-          <h4 className="mb-3">Biểu đồ đơn đặt phòng 7 ngày gần nhất</h4>
-          {loading ? (
-            <Spinner animation="border" />
-          ) : (
-            <ResponsiveContainer width="100%" height={320}>
-              <BarChart data={chartData} margin={{ top: 16, right: 32, left: 0, bottom: 16 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="totalBookings" fill="#8884d8" name="Tổng đặt phòng" />
-                <Bar dataKey="confirmedBookings" fill="#82ca9d" name="Đã xác nhận" />
-              </BarChart>
-            </ResponsiveContainer>
-          )}
-        </Col>
-      </Row>
-    </Container>
+            <Card className={styles.reservationsCard}>
+              <div className={styles.cardTitle}>Đặt phòng gần đây</div>
+              <div className={styles.reservationsList}>
+                {recentBookings.map((r, idx) => (
+                  <div key={idx} className={styles.reservationRow}>
+                    <span>{r.customerName || r.customer?.name || r.name}</span>
+                    <span>{r.checkInDate || r.date}</span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+          <div className={styles.gridRow}>
+            <Card className={styles.occupancyCard}>
+              <div className={styles.cardTitle}>Tỉ lệ lấp đầy</div>
+              <div style={{ width: '100%', height: 180 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 8 }}>
+                    <XAxis dataKey="day" tick={{ fill: '#1C1C1E', fontWeight: 500 }} />
+                    <YAxis domain={[0, 100]} tick={{ fill: '#1C1C1E', fontWeight: 500 }} />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="value" stroke="#00AEEF" strokeWidth={3} dot={{ r: 5, fill: '#00AEEF' }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
+            <Card className={styles.reservationsCard}>
+              <div className={styles.cardTitle}>Đặt phòng gần đây</div>
+              <div className={styles.reservationsList}>
+                {recentBookings.map((r, idx) => (
+                  <div key={idx} className={styles.reservationRow}>
+                    <span>{r.customerName || r.customer?.name || r.name}</span>
+                    <span>{r.checkOutDate || r.date}</span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        </>
+      )}
+    </div>
   );
 };
 

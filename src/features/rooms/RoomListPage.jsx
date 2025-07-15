@@ -87,10 +87,10 @@ const RoomListPage = () => {
       accessor: 'actions',
       cell: (row) => (
         <>
-          <Button variant="outline-primary" size="sm" className="me-2" onClick={() => handleViewDetail(row._id)}>
+          <Button style={{background:'#00AEEF', border:'none', color:'#fff'}} size="sm" className="me-2" onClick={() => handleViewDetail(row._id)}>
             👁 Xem
           </Button>
-          <Button variant="outline-danger" size="sm" onClick={() => handleDelete(row._id)}>
+          <Button style={{background:'#dc3545', border:'none', color:'#fff'}} size="sm" onClick={() => handleDelete(row._id)}>
             🗑 Xoá
           </Button>
         </>
@@ -102,7 +102,15 @@ const RoomListPage = () => {
     <Container className={styles.roomPageContainer}>
       <div className={styles.roomHeader}>
         <h2 className={styles.roomTitle}>Danh sách phòng</h2>
-        <CustomButton className={styles.addRoomBtn} variant="success" onClick={() => setShowModal(true)}>+ Thêm phòng</CustomButton>
+        <Button
+          className={styles.addRoomBtn}
+          style={{ background: '#00AEEF', color: '#fff', border: 'none', borderRadius: 6, fontWeight: 500, fontSize: '1rem', padding: '0.5rem 1.2rem', transition: 'background 0.2s' }}
+          onClick={() => setShowModal(true)}
+          onMouseOver={e => e.currentTarget.style.background = '#0095c8'}
+          onMouseOut={e => e.currentTarget.style.background = '#00AEEF'}
+        >
+          + Thêm phòng
+        </Button>
       </div>
       <RoomFilterBar search={search} setSearch={setSearch} />
       <RoomTable columns={columns} data={filteredRooms} loading={loading} />

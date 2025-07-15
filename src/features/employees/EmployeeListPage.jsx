@@ -115,9 +115,9 @@ const EmployeeListPage = () => {
       accessor: 'actions',
       cell: (row) => (
         <>
-          <Button variant="outline-primary" size="sm" className="me-2" onClick={() => handleViewDetail(row._id)}>👁 Xem</Button>
-          <Button variant="outline-warning" size="sm" className="me-2" onClick={() => { setSelectedEmployee(row); setShowUpdate(true); }}>✏ Sửa</Button>
-          <Button variant="outline-danger" size="sm" onClick={() => { setSelectedEmployee(row); setShowDelete(true); }}>🗑 Xoá</Button>
+          <Button style={{background:'#00AEEF', border:'none', color:'#fff'}} size="sm" className="me-2" onClick={() => handleViewDetail(row._id)}>👁 Xem</Button>
+          <Button style={{background:'#ffc107', border:'none', color:'#1C1C1E'}} size="sm" className="me-2" onClick={() => { setSelectedEmployee(row); setShowUpdate(true); }}>✏ Sửa</Button>
+          <Button style={{background:'#dc3545', border:'none', color:'#fff'}} size="sm" onClick={() => { setSelectedEmployee(row); setShowDelete(true); }}>🗑 Xoá</Button>
         </>
       )
     }
@@ -148,11 +148,11 @@ const EmployeeListPage = () => {
             placeholder="Tìm kiếm theo tên, email, số điện thoại..."
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(0); }}
-            style={{ display: 'inline-block', width: '55%' }}
+            style={{ display: 'inline-block', width: '55%', background: '#fff', color: '#1C1C1E', border: '1.5px solid #e9ecef', borderRadius: 8 }}
           />
           <Form.Select
             className="ms-2"
-            style={{ display: 'inline-block', width: '30%' }}
+            style={{ display: 'inline-block', width: '30%', background: '#fff', color: '#1C1C1E', border: '1.5px solid #e9ecef', borderRadius: 8 }}
             value={roleFilter}
             onChange={e => { setRoleFilter(e.target.value); setPage(0); }}
           >
@@ -160,15 +160,18 @@ const EmployeeListPage = () => {
             <option value="Manager">Manager</option>
             <option value="Admin">Admin</option>
           </Form.Select>
-          <Button variant="success" className="ms-2 d-none">+ Thêm nhân viên</Button>
         </Col>
       </Row>
       <TableWrapper columns={columns} data={employees} loading={loading} />
-      <Row className="mt-3">
-        <Col>
-          <Pagination>{paginationItems}</Pagination>
-        </Col>
-      </Row>
+      {employees.length > 0 && (
+        <Row className="mt-3">
+          <Col>
+            <Pagination>
+              {paginationItems.map((item, idx) => React.cloneElement(item, { style: { background: '#fff', color: '#1C1C1E', border: '1px solid #e9ecef', borderRadius: 6, margin: '0 2px' } }))}
+            </Pagination>
+          </Col>
+        </Row>
+      )}
       <EmployeeDetailModal
         show={showDetail}
         onHide={() => setShowDetail(false)}
