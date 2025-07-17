@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, Container, Row, Col, Card, Alert } from 'react-bootstrap';
-import { signup } from './AuthAPI';
+import { signupCustomer } from '../customers/CustomerAPI';
 
 const SignupPage = () => {
-  const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [form, setForm] = useState({ fullName: '', email: '', password: '', phone: '', address: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,7 +20,7 @@ const SignupPage = () => {
     setSuccess('');
     setLoading(true);
     try {
-      await signup(form);
+      await signupCustomer(form);
       setSuccess('Đăng ký thành công! Chuyển về trang đăng nhập...');
       setTimeout(() => navigate('/login'), 1500);
     } catch (err) {
@@ -44,9 +44,9 @@ const SignupPage = () => {
                   <Form.Label>Họ tên</Form.Label>
                   <Form.Control
                     type="text"
-                    name="name"
+                    name="fullName"
                     placeholder="Nhập họ tên"
-                    value={form.name}
+                    value={form.fullName}
                     onChange={handleChange}
                     required
                   />
@@ -60,6 +60,27 @@ const SignupPage = () => {
                     value={form.email}
                     onChange={handleChange}
                     required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Số điện thoại</Form.Label>
+                  <Form.Control
+                    type="tel"
+                    name="phone"
+                    placeholder="Nhập số điện thoại"
+                    value={form.phone}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Địa chỉ</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="address"
+                    placeholder="Nhập địa chỉ"
+                    value={form.address}
+                    onChange={handleChange}
                   />
                 </Form.Group>
                 <Form.Group className="mb-4">

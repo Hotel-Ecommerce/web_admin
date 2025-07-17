@@ -8,7 +8,8 @@ const UpdateCustomerModal = ({ show, onHide, customer, onUpdate }) => {
     fullName: '',
     email: '',
     phone: '',
-    address: ''
+    address: '',
+    password: ''
   });
 
   useEffect(() => {
@@ -17,7 +18,8 @@ const UpdateCustomerModal = ({ show, onHide, customer, onUpdate }) => {
         fullName: customer.fullName || '',
         email: customer.email || '',
         phone: customer.phone || '',
-        address: customer.address || ''
+        address: customer.address || '',
+        password: '' // Clear password field when customer data is loaded
       });
     }
   }, [customer]);

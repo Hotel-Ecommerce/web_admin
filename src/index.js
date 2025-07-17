@@ -6,6 +6,7 @@ import App from './App';
 
 import 'bootstrap/dist/css/bootstrap.min.css'; // React Bootstrap
 import './index.css'; // nếu bạn có css custom (có thể xóa nếu không dùng)
+import { UserProvider } from './context/UserContext';
 
 const container = document.getElementById('root');
 const root = createRoot(container);
@@ -13,7 +14,9 @@ const root = createRoot(container);
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <UserProvider>
+        <App />
+      </UserProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

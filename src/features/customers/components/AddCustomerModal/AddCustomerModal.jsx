@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Modal, Button, Form, Alert, Spinner } from 'react-bootstrap';
+import styles from './AddCustomerModal.module.scss';
 
 const AddCustomerModal = ({ show, onHide, onAdd, loading }) => {
   const [form, setForm] = useState({
     fullName: '',
     email: '',
     phone: '',
-    address: ''
+    address: '',
+    password: ''
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -45,7 +47,7 @@ const AddCustomerModal = ({ show, onHide, onAdd, loading }) => {
   };
 
   return (
-    <Modal show={show} onHide={handleClose} centered>
+    <Modal show={show} onHide={handleClose} centered className={styles['add-customer-modal']}>
       <Modal.Header closeButton>
         <Modal.Title>Thêm khách hàng mới</Modal.Title>
       </Modal.Header>
@@ -79,6 +81,16 @@ const AddCustomerModal = ({ show, onHide, onAdd, loading }) => {
               type="tel"
               name="phone"
               value={form.phone}
+              onChange={handleChange}
+              required
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Mật khẩu</Form.Label>
+            <Form.Control
+              type="password"
+              name="password"
+              value={form.password}
               onChange={handleChange}
               required
             />

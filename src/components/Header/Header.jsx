@@ -1,14 +1,16 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 import styles from './Header.module.scss';
 import { signout } from '../../features/auth/AuthAPI';
+import { UserContext } from '../../context/UserContext';
 
 const Header = () => {
   const [open, setOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const avatarRef = useRef();
   const navigate = useNavigate();
+  const { user } = useContext(UserContext);
 
   useEffect(() => {
     const handleClickOutside = (event) => {

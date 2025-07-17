@@ -1,5 +1,13 @@
 import axios from 'axios';
-const API_URL = '/rooms';
+import {
+  API_URL_ROOMS,
+  API_URL_ROOMS_ADD,
+  API_URL_ROOMS_UPDATE,
+  API_URL_ROOMS_DELETE,
+  API_URL_ROOMS_GET,
+  API_URL_ROOMS_LIST,
+  API_URL_ROOM_BY_ID
+} from '../../core/constant/api_constant';
 
 const getAuthHeader = () => {
   const token = localStorage.getItem('token');
@@ -7,13 +15,13 @@ const getAuthHeader = () => {
 };
 
 export const queryRooms = async (params = {}) =>
-  axios.get(`${API_URL}/list`, { params }).then(res => res.data);
+  axios.get(API_URL_ROOMS_LIST, { params }).then(res => res.data);
 
 export const getRoomById = async (id) =>
-  axios.get(`${API_URL}/${id}`).then(res => res.data);
+  axios.get(API_URL_ROOM_BY_ID(id)).then(res => res.data);
 
 export const addRoom = async (formData) =>
-  axios.post(`${API_URL}/add`, formData, {
+  axios.post(API_URL_ROOMS_ADD, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
       ...getAuthHeader()
@@ -22,7 +30,7 @@ export const addRoom = async (formData) =>
 
 export const updateRoom = async (formData) => {
   try {
-    const res = await axios.post(`${API_URL}/update`, formData, {
+    const res = await axios.post(API_URL_ROOMS_UPDATE, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
         ...getAuthHeader()
@@ -35,7 +43,7 @@ export const updateRoom = async (formData) => {
 };
 
 export const deleteRoom = async (id) =>
-  axios.post(`${API_URL}/delete`, { id }, {
+  axios.post(API_URL_ROOMS_DELETE, { id }, {
     headers: {
       'Content-Type': 'application/json',
       ...getAuthHeader()

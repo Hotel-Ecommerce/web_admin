@@ -17,7 +17,9 @@ const TableWrapper = ({ columns, data }) => {
           {data.map((row, rowIndex) => (
             <tr key={rowIndex}>
               {columns.map((col, colIndex) => (
-                <td key={colIndex}>{row[col.accessor]}</td>
+                <td key={colIndex}>
+                  {col.cell ? col.cell(row) : row[col.accessor]}
+                </td>
               ))}
             </tr>
           ))}

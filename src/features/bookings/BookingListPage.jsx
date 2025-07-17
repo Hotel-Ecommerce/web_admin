@@ -6,6 +6,7 @@ import BookingDetailModal from './components/BookingDetailModal/BookingDetailMod
 import DeleteBookingModal from './components/DeleteBookingModal/DeleteBookingModal';
 import AddBookingModal from './components/AddBookingModal/AddBookingModal';
 import UpdateBookingModal from './components/UpdateBookingModal/UpdateBookingModal';
+import BookingFilterBar from './components/BookingFilterBar/BookingFilterBar';
 import styles from './BookingListPage.module.scss';
 
 const BookingListPage = () => {
@@ -30,6 +31,7 @@ const BookingListPage = () => {
     checkOutDate: '',
     paymentStatus: ''
   });
+  const [filteredBookings, setFilteredBookings] = useState([]);
 
   // Load bookings
   const loadBookings = async () => {
@@ -112,6 +114,38 @@ const BookingListPage = () => {
     }
   };
 
+  // Lọc dữ liệu khi bấm "Tìm kiếm"
+  const handleFilter = () => {
+    let filtered = bookings.filter(b => {
+      const matchCustomer = filters.customerId === '' || (b.customerId && b.customerId.toLowerCase().includes(filters.customerId.toLowerCase()));
+      const matchRoom = filters.roomId === '' || (b.roomId && b.roomId.toString().includes(filters.roomId));
+      const matchCheckIn = (!filters.checkInDate || new Date(b.checkInDate) >= new Date(filters.checkInDate)) &&
+                           (!filters.checkOutDate || new Date(b.checkOutDate) <= new Date(filters.checkOutDate));
+      const matchPayment = filters.paymentStatus === '' || b.paymentStatus === filters.paymentStatus;
+      return matchCustomer && matchRoom && matchCheckIn && matchPayment;
+    });
+    setFilteredBookings(filtered);
+  };
+
+  // Reset filter
+  const handleReset = () => {
+    setFilters({
+      page: 0,
+      size: 20,
+      customerId: '',
+      roomId: '',
+      checkInDate: '',
+      checkOutDate: '',
+      paymentStatus: ''
+    });
+    setFilteredBookings(bookings);
+  };
+
+  // Khi bookings thay đổi, reset filteredBookings
+  useEffect(() => {
+    setFilteredBookings(bookings);
+  }, [bookings]);
+
   // Table columns configuration
   const columns = [
     { header: 'Khách hàng', accessor: 'customerName' },
@@ -135,100 +169,18 @@ const BookingListPage = () => {
 
   return (
     <Container className={styles.bookingPageContainer}>
+      <BookingFilterBar
+        filters={filters}
+        setFilters={setFilters}
+        onFilter={handleFilter}
+        onReset={handleReset}
+      />
       <div className={styles.bookingHeader}>
         <h2 className={styles.bookingTitle}>Danh sách đặt phòng</h2>
         <Button variant="success" className={styles.addBookingBtn} onClick={() => setShowAddModal(true)}>
           + Thêm đặt phòng
         </Button>
       </div>
-
-      {/* Filters */}
-      <Row className={`mb-4 ${styles.filterRow}`}>
-        <Col md={12}>
-          <Form className="bg-light p-3 rounded">
-            <Row>
-              <Col md={2}>
-                <Form.Group>
-                  <Form.Label style={{color:'#1C1C1E'}}>ID Khách hàng</Form.Label>
-                  <Form.Control
-                    type="text"
-                    value={filters.customerId}
-                    onChange={(e) => handleFilterChange('customerId', e.target.value)}
-                    placeholder="Nhập ID khách hàng"
-                    style={{ background: '#fff', color: '#1C1C1E', border: '1.5px solid #e9ecef', borderRadius: 8 }}
-                  />
-                </Form.Group>
-              </Col>
-              <Col md={2}>
-                <Form.Group>
-                  <Form.Label style={{color:'#1C1C1E'}}>ID Phòng</Form.Label>
-                  <Form.Control
-                    type="text"
-                    value={filters.roomId}
-                    onChange={(e) => handleFilterChange('roomId', e.target.value)}
-                    placeholder="Nhập ID phòng"
-                    style={{ background: '#fff', color: '#1C1C1E', border: '1.5px solid #e9ecef', borderRadius: 8 }}
-                  />
-                </Form.Group>
-              </Col>
-              <Col md={2}>
-                <Form.Group>
-                  <Form.Label style={{color:'#1C1C1E'}}>Từ ngày</Form.Label>
-                  <Form.Control
-                    type="date"
-                    value={filters.checkInDate}
-                    onChange={(e) => handleFilterChange('checkInDate', e.target.value)}
-                    style={{ background: '#fff', color: '#1C1C1E', border: '1.5px solid #e9ecef', borderRadius: 8 }}
-                  />
-                </Form.Group>
-              </Col>
-              <Col md={2}>
-                <Form.Group>
-                  <Form.Label style={{color:'#1C1C1E'}}>Đến ngày</Form.Label>
-                  <Form.Control
-                    type="date"
-                    value={filters.checkOutDate}
-                    onChange={(e) => handleFilterChange('checkOutDate', e.target.value)}
-                    style={{ background: '#fff', color: '#1C1C1E', border: '1.5px solid #e9ecef', borderRadius: 8 }}
-                  />
-                </Form.Group>
-              </Col>
-              <Col md={3}>
-                <Form.Group>
-                  <Form.Label style={{color:'#1C1C1E'}}>Trạng thái thanh toán</Form.Label>
-                  <Form.Select
-                    value={filters.paymentStatus}
-                    onChange={(e) => handleFilterChange('paymentStatus', e.target.value)}
-                    style={{ background: '#fff', color: '#1C1C1E', border: '1.5px solid #e9ecef', borderRadius: 8 }}
-                  >
-                    <option value="">Tất cả</option>
-                    <option value="PENDING">Chờ thanh toán</option>
-                    <option value="PAID">Đã thanh toán</option>
-                    <option value="CANCELLED">Đã hủy</option>
-                  </Form.Select>
-                </Form.Group>
-              </Col>
-              <Col md={2} className={styles.filterBtnCol}>
-                <Button 
-                  style={{background:'#e9ecef', color:'#1C1C1E', border:'none'}} 
-                  onClick={() => setFilters({
-                    page: 0,
-                    size: 20,
-                    customerId: '',
-                    roomId: '',
-                    checkInDate: '',
-                    checkOutDate: '',
-                    paymentStatus: ''
-                  })}
-                  className="w-100"
-                >
-                  Xóa bộ lọc
-                </Button>
-              </Col>
-            </Row>
-          </Form>
-        </Col>
-      </Row>
 
       {/* Error Alert */}
       {error && (
@@ -248,7 +200,7 @@ const BookingListPage = () => {
 
       {/* Bookings Table */}
       {!loading && (
-        <TableWrapper columns={columns} data={bookings} loading={loading} />
+        <TableWrapper columns={columns} data={filteredBookings} loading={loading} />
       )}
 
       {/* Pagination */}
@@ -256,7 +208,7 @@ const BookingListPage = () => {
         <Row className="mt-3">
           <Col className="d-flex justify-content-between align-items-center">
             <div style={{color:'#6C757D'}}>
-              Trang {filters.page + 1} - Hiển thị {bookings.length} kết quả
+              Trang {filters.page + 1} - Hiển thị {filteredBookings.length} kết quả
             </div>
             <div>
               <Button

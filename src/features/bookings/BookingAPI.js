@@ -1,5 +1,12 @@
 // src/features/bookings/BookingAPI.js
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+import {
+  API_URL_BOOKINGS,
+  API_URL_BOOKINGS_ADD,
+  API_URL_BOOKINGS_UPDATE,
+  API_URL_BOOKINGS_DELETE,
+  API_URL_BOOKINGS_GET,
+  API_URL_BOOKINGS_LIST
+} from '../../core/constant/api_constant';
 
 class BookingAPI {
   // Get booking list with filters
@@ -15,7 +22,7 @@ class BookingAPI {
     if (params.checkOutDate !== undefined) queryParams.append('checkOutDate', params.checkOutDate);
     if (params.paymentStatus !== undefined) queryParams.append('paymentStatus', params.paymentStatus);
 
-    const url = `${API_BASE_URL}/bookings/list?${queryParams.toString()}`;
+    const url = `${API_URL_BOOKINGS_LIST}?${queryParams.toString()}`;
     
     try {
       const response = await fetch(url, {
@@ -40,7 +47,7 @@ class BookingAPI {
   // Add new booking
   static async addBooking(bookingData) {
     try {
-      const response = await fetch(`${API_BASE_URL}/bookings/add`, {
+      const response = await fetch(API_URL_BOOKINGS_ADD, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -69,7 +76,7 @@ class BookingAPI {
   // Get booking by ID
   static async getBookingById(id) {
     try {
-      const response = await fetch(`${API_BASE_URL}/bookings/${id}`, {
+      const response = await fetch(API_URL_BOOKINGS_GET(id), {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -91,7 +98,7 @@ class BookingAPI {
   // Update booking
   static async updateBooking(bookingData) {
     try {
-      const response = await fetch(`${API_BASE_URL}/bookings/update`, {
+      const response = await fetch(API_URL_BOOKINGS_UPDATE, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -122,7 +129,7 @@ class BookingAPI {
   // Delete booking
   static async deleteBooking(id) {
     try {
-      const response = await fetch(`${API_BASE_URL}/bookings/delete`, {
+      const response = await fetch(API_URL_BOOKINGS_DELETE(id), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

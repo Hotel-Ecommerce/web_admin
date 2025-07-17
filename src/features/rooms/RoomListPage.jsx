@@ -6,6 +6,8 @@ import { queryRooms, deleteRoom, getRoomById } from './RoomAPI';
 import RoomFilterBar from './components/RoomFilterBar/RoomFilterBar';
 import RoomTable from './components/RoomTable/RoomTable';
 import styles from './RoomListPage.module.scss';
+import UpdateRoomModal from './components/UpdateRoom/UpdateRoomModal';
+import RoomDetailModal from './components/RoomDetailModal/RoomDetailModal';
 // ...import các modal khác nếu có
 
 const RoomListPage = () => {
@@ -16,6 +18,7 @@ const RoomListPage = () => {
   const [filteredRooms, setFilteredRooms] = useState([]);
   const [showDetail, setShowDetail] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const [showUpdate, setShowUpdate] = useState(false);
 
   // Fetch room list from backend
   useEffect(() => {
@@ -90,6 +93,9 @@ const RoomListPage = () => {
           <Button style={{background:'#00AEEF', border:'none', color:'#fff'}} size="sm" className="me-2" onClick={() => handleViewDetail(row._id)}>
             👁 Xem
           </Button>
+          <Button style={{background:'#ffc107', border:'none', color:'#1C1C1E'}} size="sm" className="me-2" onClick={() => { setSelectedRoom(row); setShowUpdate(true); }}>
+            ✏ Sửa
+          </Button>
           <Button style={{background:'#dc3545', border:'none', color:'#fff'}} size="sm" onClick={() => handleDelete(row._id)}>
             🗑 Xoá
           </Button>
@@ -118,6 +124,17 @@ const RoomListPage = () => {
         show={showModal}
         onHide={() => setShowModal(false)}
         setRooms={setRooms}
+      />
+      <UpdateRoomModal
+        show={showUpdate}
+        onHide={() => setShowUpdate(false)}
+        room={selectedRoom}
+        setRooms={setRooms}
+      />
+      <RoomDetailModal
+        show={showDetail}
+        onHide={() => setShowDetail(false)}
+        room={selectedRoom}
       />
       {/* Các modal khác như RoomDetailModal nếu có */}
     </Container>

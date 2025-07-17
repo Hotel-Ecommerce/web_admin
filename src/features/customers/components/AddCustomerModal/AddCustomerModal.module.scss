@@ -1,0 +1,25 @@
+.add-customer-modal {
+  .modal-header {
+    background: #e3fcec;
+    color: #155724;
+  }
+  .modal-body {
+    font-size: 1.1rem;
+    color: #333;
+    .form-label {
+      font-weight: 500;
+    }
+    .form-control {
+      border-radius: 6px;
+      border: 1.5px solid #e9ecef;
+      &:focus {
+        border-color: #00AEEF;
+        box-shadow: 0 0 0 0.2rem rgba(0,174,239,0.15);
+      }
+    }
+  }
+  .modal-footer {
+    background: #f7f9fc;
+    border-top: 1px solid #e9ecef;
+  }
+} 

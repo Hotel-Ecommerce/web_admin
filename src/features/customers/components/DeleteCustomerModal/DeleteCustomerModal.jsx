@@ -17,7 +17,7 @@ const DeleteCustomerModal = ({ show, onHide, customer, onDelete }) => {
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide}>Huỷ</Button>
-        <Button variant="danger" onClick={() => onDelete(customer.id)}>Xoá</Button>
+        <Button variant="danger" onClick={() => onDelete(customer._id)}>Xoá</Button>
       </Modal.Footer>
     </Modal>
   );
