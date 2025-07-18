@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import { Modal, Button, Form, Alert, Spinner } from 'react-bootstrap';
+import { addEmployee } from '../../EmployeeAPI';
 
-const AddEmployeeModal = ({ show, onHide, onAdd, loading }) => {
+const AddEmployeeModal = ({ open, onClose, token, onAdded }) => {
   const [form, setForm] = useState({
     fullName: '',
     email: '',
     phone: '',
-    role: 'Manager'
+    role: 'Manager',
+    password: ''
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -20,32 +23,38 @@ const AddEmployeeModal = ({ show, onHide, onAdd, loading }) => {
     e.preventDefault();
     setError('');
     setSuccess('');
-    if (!form.fullName || !form.email || !form.role) {
-      setError('Vui lòng nhập đầy đủ họ tên, email và vai trò.');
+    if (!form.fullName || !form.email || !form.role || !form.password) {
+      setError('Vui lòng nhập đầy đủ họ tên, email, vai trò và mật khẩu.');
       return;
     }
+    setLoading(true);
     try {
-      await onAdd(form);
+      await addEmployee(form, token);
       setSuccess('Thêm nhân viên thành công!');
-      setForm({ fullName: '', email: '', phone: '', role: 'Manager' });
+      setForm({ fullName: '', email: '', phone: '', role: 'Manager', password: '' });
+      if (onAdded) onAdded();
       setTimeout(() => {
         setSuccess('');
-        onHide();
+        onClose();
       }, 1000);
     } catch (err) {
       setError('Có lỗi xảy ra khi thêm nhân viên.');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleClose = () => {
     setError('');
     setSuccess('');
-    setForm({ fullName: '', email: '', phone: '', role: 'Manager' });
-    onHide();
+    setForm({ fullName: '', email: '', phone: '', role: 'Manager', password: '' });
+    onClose();
   };
 
+  if (!open) return null;
+
   return (
-    <Modal show={show} onHide={handleClose} centered>
+    <Modal show={open} onHide={handleClose} centered>
       <Modal.Header closeButton>
         <Modal.Title>Thêm nhân viên mới</Modal.Title>
       </Modal.Header>
@@ -93,6 +102,16 @@ const AddEmployeeModal = ({ show, onHide, onAdd, loading }) => {
               <option value="Manager">Manager</option>
               <option value="Admin">Admin</option>
             </Form.Select>
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Mật khẩu</Form.Label>
+            <Form.Control
+              type="password"
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
           </Form.Group>
           <div className="text-end">
             <Button variant="secondary" onClick={handleClose} disabled={loading}>Huỷ</Button>{' '}

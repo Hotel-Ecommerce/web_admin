@@ -1,34 +1,22 @@
 .filterBar {
-  background: #fff;
-  padding: 16px 24px;
-  border-radius: 12px;
+  background: #f7f9fc;
+  padding: 16px 20px 8px 20px;
+  border-radius: 8px;
+  margin-bottom: 18px;
   box-shadow: 0 2px 8px rgba(30,42,56,0.06);
-  margin-bottom: 24px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  align-items: end;
 }
 
-.filterField {
-  min-width: 180px;
-  flex: 1 1 180px;
+.filterBar label {
+  font-weight: 500;
+  color: #1976d2;
+  margin-bottom: 4px;
 }
 
-.filterButton {
-  min-width: 120px;
-  font-weight: 600;
-  border-radius: 6px;
-  margin-left: 8px;
-}
-
-@media (max-width: 768px) {
-  .filterBar {
-    flex-direction: column;
-    gap: 12px;
-    padding: 12px;
-  }
-  .filterField, .filterButton {
-    min-width: 100%;
-  }
+.filterBar input,
+.filterBar select {
+  background: #fff;
+  color: #1C1C1E;
+  border: 1.5px solid #e9ecef;
+  border-radius: 8px;
+  margin-bottom: 8px;
 } 

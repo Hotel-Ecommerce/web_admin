@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import styles from './Sidebar.module.scss';
 import { UserContext } from '../../context/UserContext';
 
-const menuConfig = [
+const menuConfig = [ 
   { path: '/dashboard', label: 'Dashboard', icon: '📊', roles: ['Manager', 'Admin', 'Customer'] },
   { path: '/customers', label: 'Khách hàng', icon: '👥', roles: ['Manager', 'Admin'] },
   { path: '/rooms', label: 'Phòng', icon: '🏨', roles: ['Manager', 'Admin'] },
@@ -12,14 +12,17 @@ const menuConfig = [
   { path: '/employees', label: 'Nhân viên', icon: '👨‍💼', roles: ['Manager'] },
   { path: '/statistics', label: 'Thống kê', icon: '📈', roles: ['Manager'] },
 ];
+const adminMenuConfig = [
+  { path: '/customers', label: 'Khách hàng', icon: '👥', roles: ['Manager', 'Admin'] },
+  { path: '/rooms', label: 'Phòng', icon: '🏨', roles: ['Manager', 'Admin'] },
+  { path: '/bookings', label: 'Đặt phòng', icon: '📅', roles: ['Manager', 'Admin', 'Customer'] }
+];
 
 const Sidebar = () => {
   const location = useLocation();
-  // const { user } = useContext(UserContext);
-  // const userRole = user && user.role ? user.role.toLowerCase() : '';
-
-  // Luôn hiển thị tất cả menu
-  const filteredMenu = menuConfig;
+  const { user } = useContext(UserContext);
+  
+  const filteredMenu = user.role === 'Admin' ? adminMenuConfig : menuConfig;
 
   return (
     <nav className={styles.sidebar}>

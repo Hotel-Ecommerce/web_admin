@@ -1,0 +1,31 @@
+.employeePage {
+  max-width: 900px;
+  margin: 32px auto;
+  background: #fafbfc;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  padding: 32px 28px 40px 28px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.addBtn {
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s;
+  font-size: 22px;
+}
+.addBtn:hover {
+  background: rgba(67, 160, 71, 0.12);
+} 

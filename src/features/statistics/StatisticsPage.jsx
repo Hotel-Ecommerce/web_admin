@@ -1,26 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Form, Button, Spinner, Table } from 'react-bootstrap';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 import { getBookingStatistics } from './StatisticsAPI';
+import { getRooms } from '../rooms/RoomAPI';
+import { getCustomers } from '../customers/CustomerAPI';
+import { getEmployees } from '../employees/EmployeeAPI';
 import styles from './StatisticsPage.module.scss';
+import SummaryStats from '../dashboard/SummaryStats';
+import ExportExcelModal from './ExportExcelModal';
+import FilterModal from './components/FilterModal/FilterModal';
+import { FiFilter, FiFileText } from 'react-icons/fi';
+
+const STATUS_OPTIONS = [
+  { value: '', label: 'Tất cả trạng thái' },
+  { value: 'Confirmed', label: 'Đã xác nhận' },
+  { value: 'Cancelled', label: 'Đã hủy' },
+  { value: 'Completed', label: 'Hoàn thành' },
+  { value: 'Pending', label: 'Chờ xác nhận' },
+];
 
 const StatisticsPage = () => {
   const today = new Date().toISOString().slice(0, 10);
   const weekAgo = new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
-  const [startDate, setStartDate] = useState(weekAgo);
-  const [endDate, setEndDate] = useState(today);
-  const [groupBy, setGroupBy] = useState('day');
+  const [showFilter, setShowFilter] = useState(false);
+  const [filter, setFilter] = useState({
+    startDate: weekAgo,
+    endDate: today,
+    groupBy: 'day',
+    roomType: '',
+    status: ''
+  });
+  const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(false);
   const [chartData, setChartData] = useState([]);
   const [error, setError] = useState('');
+  const [showExport, setShowExport] = useState(false);
 
-  const handleFetch = async (e) => {
-    e.preventDefault();
+  // Lấy danh sách phòng khi load trang
+  useEffect(() => {
+    (async () => {
+      try {
+        const roomList = await getRooms();
+        setRooms(Array.isArray(roomList) ? roomList : roomList.rooms || []);
+      } catch {}
+    })();
+  }, []);
+
+  // Lấy danh sách loại phòng duy nhất
+  const roomTypes = Array.from(new Set(rooms.map(r => r.type).filter(Boolean)));
+
+  // Hàm fetch mới dùng filter
+  const fetchWithFilter = async (f) => {
     setError('');
     setLoading(true);
     try {
-      const params = { startDate, endDate, groupBy };
+      const params = { ...f };
       const data = await getBookingStatistics(params);
       setChartData(Array.isArray(data) ? data : [data]);
     } catch (err) {
@@ -31,42 +66,37 @@ const StatisticsPage = () => {
     }
   };
 
+  // Khi load lần đầu, fetch dữ liệu với filter mặc định
+  useEffect(() => { fetchWithFilter(filter); }, []);
+
   return (
     <Container className={styles.statisticsPageContainer}>
       <div className={styles.statisticsHeader}>
         <h2 className={styles.statisticsTitle}>Thống kê đặt phòng</h2>
+        <Button variant="primary" onClick={() => setShowFilter(true)} style={{marginLeft:16}} aria-label="Bộ lọc nâng cao" title="Bộ lọc nâng cao">
+          <FiFilter size={26} color="#ff9800" />
+        </Button>
       </div>
-      <Form onSubmit={handleFetch} className={styles.statisticsFilterBar}>
-        <Row className="align-items-end">
-          <Col md={3}>
-            <Form.Label style={{color:'#1C1C1E'}}>Từ ngày</Form.Label>
-            <Form.Control type="date" value={startDate} onChange={e => setStartDate(e.target.value)} required style={{ background: '#fff', color: '#1C1C1E', border: '1.5px solid #e9ecef', borderRadius: 8 }} />
-          </Col>
-          <Col md={3}>
-            <Form.Label style={{color:'#1C1C1E'}}>Đến ngày</Form.Label>
-            <Form.Control type="date" value={endDate} onChange={e => setEndDate(e.target.value)} required style={{ background: '#fff', color: '#1C1C1E', border: '1.5px solid #e9ecef', borderRadius: 8 }} />
-          </Col>
-          <Col md={3}>
-            <Form.Label style={{color:'#1C1C1E'}}>Nhóm theo</Form.Label>
-            <Form.Select value={groupBy} onChange={e => setGroupBy(e.target.value)} style={{ background: '#fff', color: '#1C1C1E', border: '1.5px solid #e9ecef', borderRadius: 8 }}>
-              <option value="day">Ngày</option>
-              <option value="month">Tháng</option>
-              <option value="year">Năm</option>
-            </Form.Select>
-          </Col>
-          <Col md={3} className="text-end">
-            <Button type="submit" style={{background:'#00AEEF', color:'#fff', border:'none', borderRadius: 6, fontWeight: 500, fontSize: '1rem', padding: '0.5rem 1.2rem', transition: 'background 0.2s'}} onMouseOver={e => e.currentTarget.style.background = '#0095c8'} onMouseOut={e => e.currentTarget.style.background = '#00AEEF'}>
-              Lấy thống kê
-            </Button>
-          </Col>
-        </Row>
-      </Form>
+      <FilterModal
+        show={showFilter}
+        onClose={() => setShowFilter(false)}
+        onApply={f => { setFilter(f); fetchWithFilter(f); }}
+        rooms={rooms}
+        defaultFilter={filter}
+      />
       {error && <div className="text-danger mb-3">{error}</div>}
       {loading ? (
         <Spinner animation="border" />
       ) : (
         chartData.length > 0 && (
           <>
+            <SummaryStats data={chartData} title="Tổng quan đặt phòng" />
+            <div className="mb-2 text-end">
+              <Button variant="success" onClick={() => setShowExport(true)}>
+                <FiFileText size={20} style={{marginRight: 6, marginBottom: 2}} /> Xuất Excel
+              </Button>
+            </div>
+            <ExportExcelModal show={showExport} onClose={() => setShowExport(false)} data={chartData} defaultFileName={`thong_ke_booking_${filter.startDate}_to_${filter.endDate}.xlsx`} />
             <ResponsiveContainer width="100%" height={350}>
               <BarChart data={chartData} margin={{ top: 16, right: 32, left: 0, bottom: 16 }}>
                 <CartesianGrid strokeDasharray="3 3" />

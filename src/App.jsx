@@ -62,7 +62,7 @@ function App() {
       <Route
         path="/employees"
         element={
-          <PrivateRoute roles={["Manager"]}>
+          <PrivateRoute>
             <MainLayout>
               <EmployeeListPage />
             </MainLayout>
@@ -72,7 +72,7 @@ function App() {
       <Route
         path="/statistics"
         element={
-          <PrivateRoute roles={["Manager"]}>
+          <PrivateRoute>
             <MainLayout>
               <StatisticsPage />
             </MainLayout>

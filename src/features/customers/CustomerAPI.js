@@ -49,3 +49,11 @@ export const signupCustomer = async (customerData) => {
   const res = await axios.post(API_URL_AUTH_SIGNUP, customerData);
   return res.data;
 };
+
+export const getCustomers = async (token) => {
+  if (!token) token = localStorage.getItem('token');
+  const res = await axios.get(API_URL_CUSTOMERS_LIST, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {}
+  });
+  return res.data;
+};

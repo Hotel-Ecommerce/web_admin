@@ -1,29 +1,49 @@
 import axios from 'axios';
 import {
   API_URL_EMPLOYEES,
+  API_URL_EMPLOYEES_LIST,
   API_URL_EMPLOYEES_ADD,
   API_URL_EMPLOYEES_UPDATE,
   API_URL_EMPLOYEES_DELETE,
-  API_URL_EMPLOYEES_GET,
-  API_URL_EMPLOYEES_LIST
+  API_URL_EMPLOYEE_BY_ID
 } from '../../core/constant/api_constant';
 
-const getAuthHeader = () => {
-  const token = localStorage.getItem('token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
+// Lấy danh sách nhân viên
+export const getEmployees = async (token) => {
+  const res = await axios.get(API_URL_EMPLOYEES_LIST, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return res.data;
 };
 
-export const queryEmployees = async (params = {}) =>
-  axios.get(API_URL_EMPLOYEES_LIST, { params, headers: { ...getAuthHeader() } }).then(res => res.data);
+// Thêm nhân viên mới
+export const addEmployee = async (data, token) => {
+  const res = await axios.post(API_URL_EMPLOYEES_ADD, data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return res.data;
+};
 
-export const getEmployeeById = async (id) =>
-  axios.get(`${API_URL_EMPLOYEES}/${id}`, { headers: { ...getAuthHeader() } }).then(res => res.data);
+// Lấy thông tin nhân viên theo ID
+export const getEmployeeById = async (id, token) => {
+  const res = await axios.get(API_URL_EMPLOYEE_BY_ID(id), {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return res.data;
+};
 
-export const addEmployee = async (data) =>
-  axios.post(API_URL_EMPLOYEES_ADD, data, { headers: { ...getAuthHeader() } }).then(res => res.data);
+// Cập nhật thông tin nhân viên
+export const updateEmployee = async (data, token) => {
+  const res = await axios.post(API_URL_EMPLOYEES_UPDATE, data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return res.data;
+};
 
-export const updateEmployee = async (data) =>
-  axios.post(API_URL_EMPLOYEES_UPDATE, data, { headers: { ...getAuthHeader() } }).then(res => res.data);
-
-export const deleteEmployee = async (id) =>
-  axios.post(API_URL_EMPLOYEES_DELETE, { id }, { headers: { ...getAuthHeader() } }).then(res => res.data);
+// Xóa nhân viên
+export const deleteEmployee = async (id, token) => {
+  const res = await axios.post(API_URL_EMPLOYEES_DELETE, { id }, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return res.data;
+}; 

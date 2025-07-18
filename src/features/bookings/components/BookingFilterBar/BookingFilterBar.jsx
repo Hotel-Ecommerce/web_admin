@@ -1,67 +1,95 @@
-import React from 'react';
-import { Form, Button } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Form, Row, Col } from 'react-bootstrap';
+import { getCustomers } from '../../../customers/CustomerAPI';
+import { getRooms } from '../../../rooms/RoomAPI';
 import styles from './BookingFilterBar.module.scss';
 
-const BookingFilterBar = ({ filters, setFilters, onFilter, onReset }) => {
+const paymentOptions = [
+  { value: '', label: '--Chọn trạng thái thanh toán--' },
+  { value: 'Paid', label: 'Đã thanh toán' },
+  { value: 'Unpaid', label: 'Chưa thanh toán' },
+  { value: 'Pending', label: 'Chờ xử lý' }
+];
+const statusOptions = [
+  { value: '', label: '--Chọn trạng thái--' },
+  { value: 'Confirmed', label: 'Đã xác nhận' },
+  { value: 'Pending', label: 'Chờ xác nhận' },
+  { value: 'Cancelled', label: 'Đã hủy' },
+  { value: 'Completed', label: 'Hoàn thành' }
+];
+
+const BookingFilterBar = ({ filter, setFilter }) => {
+  const [customers, setCustomers] = useState([]);
+  const [rooms, setRooms] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const [customerList, roomList] = await Promise.all([
+          getCustomers(),
+          getRooms()
+        ]);
+        setCustomers(Array.isArray(customerList) ? customerList : customerList.customers || []);
+        setRooms(Array.isArray(roomList) ? roomList : roomList.rooms || []);
+      } catch {
+        setCustomers([]);
+        setRooms([]);
+      }
+    })();
+  }, []);
+
+  const handleChange = e => {
+    const { name, value } = e.target;
+    setFilter(prev => ({ ...prev, [name]: value }));
+  };
+
   return (
-    <form className={styles.filterBar} onSubmit={e => { e.preventDefault(); onFilter(); }}>
-      <div className={styles.filterField}>
-        <Form.Control
-          placeholder="Tên khách hàng"
-          value={filters.customerName}
-          onChange={e => setFilters(f => ({ ...f, customerName: e.target.value }))}
-        />
-      </div>
-      <div className={styles.filterField}>
-        <Form.Control
-          placeholder="Số phòng"
-          value={filters.roomNumber}
-          onChange={e => setFilters(f => ({ ...f, roomNumber: e.target.value }))}
-        />
-      </div>
-      <div className={styles.filterField}>
-        <Form.Label>Nhận phòng từ</Form.Label>
-        <Form.Control
-          type="date"
-          value={filters.checkInDateFrom}
-          onChange={e => setFilters(f => ({ ...f, checkInDateFrom: e.target.value }))}
-        />
-      </div>
-      <div className={styles.filterField}>
-        <Form.Label>Nhận phòng đến</Form.Label>
-        <Form.Control
-          type="date"
-          value={filters.checkInDateTo}
-          onChange={e => setFilters(f => ({ ...f, checkInDateTo: e.target.value }))}
-        />
-      </div>
-      <div className={styles.filterField}>
-        <Form.Select
-          value={filters.status}
-          onChange={e => setFilters(f => ({ ...f, status: e.target.value }))}
-        >
-          <option value="">Tất cả trạng thái</option>
-          <option value="confirmed">Đã xác nhận</option>
-          <option value="pending">Đang chờ</option>
-          <option value="cancelled">Đã hủy</option>
-          <option value="checked-in">Đã nhận phòng</option>
-          <option value="checked-out">Đã trả phòng</option>
-        </Form.Select>
-      </div>
-      <div className={styles.filterField}>
-        <Form.Select
-          value={filters.paymentStatus}
-          onChange={e => setFilters(f => ({ ...f, paymentStatus: e.target.value }))}
-        >
-          <option value="">Tất cả thanh toán</option>
-          <option value="paid">Đã thanh toán</option>
-          <option value="unpaid">Chưa thanh toán</option>
-          <option value="pending">Đang xử lý</option>
-        </Form.Select>
-      </div>
-      <Button className={styles.filterButton} type="submit">Tìm kiếm</Button>
-      <Button className={styles.filterButton} variant="secondary" type="button" onClick={onReset}>Xóa bộ lọc</Button>
-    </form>
+    <Form className={styles.filterBar}>
+      <Row className="align-items-end g-2">
+        <Col md={3}>
+          <Form.Label>Khách hàng</Form.Label>
+          <Form.Select name="customerId" value={filter.customerId || ''} onChange={handleChange}>
+            <option value="">--Chọn khách hàng--</option>
+            {customers.map(c => (
+              <option key={c._id} value={c._id}>{c.fullName} ({c.email})</option>
+            ))}
+          </Form.Select>
+        </Col>
+        <Col md={2}>
+          <Form.Label>Phòng</Form.Label>
+          <Form.Select name="roomId" value={filter.roomId || ''} onChange={handleChange}>
+            <option value="">--Chọn phòng--</option>
+            {rooms.map(r => (
+              <option key={r._id} value={r._id}>{r.roomNumber} ({r.type})</option>
+            ))}
+          </Form.Select>
+        </Col>
+        <Col md={2}>
+          <Form.Label>Ngày nhận</Form.Label>
+          <Form.Control type="date" name="checkInDate" value={filter.checkInDate || ''} onChange={handleChange} />
+        </Col>
+        <Col md={2}>
+          <Form.Label>Ngày trả</Form.Label>
+          <Form.Control type="date" name="checkOutDate" value={filter.checkOutDate || ''} onChange={handleChange} />
+        </Col>
+        <Col md={1}>
+          <Form.Label>Trạng thái</Form.Label>
+          <Form.Select name="status" value={filter.status || ''} onChange={handleChange}>
+            {statusOptions.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </Form.Select>
+        </Col>
+        <Col md={2}>
+          <Form.Label>Thanh toán</Form.Label>
+          <Form.Select name="paymentStatus" value={filter.paymentStatus || ''} onChange={handleChange}>
+            {paymentOptions.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </Form.Select>
+        </Col>
+      </Row>
+    </Form>
   );
 };
 

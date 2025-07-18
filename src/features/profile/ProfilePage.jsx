@@ -13,7 +13,7 @@ const ProfilePage = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 24 }}>
             <div style={{ fontSize: 48, background: '#e0f7fa', color: '#00AEEF', borderRadius: '50%', width: 72, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>👤</div>
             <div>
-              <h4 style={{ margin: 0, color: '#1C1C1E', fontWeight: 700 }}>{user?.name || 'User'}</h4>
+              <h4 style={{ margin: 0, color: '#1C1C1E', fontWeight: 700 }}>{user?.fullName || user?.name || 'User'}</h4>
               <div style={{ color: '#6C757D', fontSize: 16 }}>{user?.role || 'Manager'}</div>
             </div>
           </div>

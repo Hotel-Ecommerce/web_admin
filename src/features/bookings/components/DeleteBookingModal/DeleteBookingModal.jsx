@@ -1,26 +1,45 @@
-import React from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Modal, Button, Alert, Spinner } from 'react-bootstrap';
+import { deleteBooking } from '../../BookingAPI';
 import styles from './DeleteBookingModal.module.scss';
 
-const DeleteBookingModal = ({ show, onHide, booking, onDelete }) => {
-  if (!booking) return null;
+const DeleteBookingModal = ({ open, onClose, booking, token, onDeleted }) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  if (!open || !booking) return null;
+
+  const handleDelete = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      await deleteBooking(booking._id, token);
+      if (onDeleted) onDeleted();
+      onClose();
+    } catch (err) {
+      setError('Xóa booking thất bại');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <Modal show={show} onHide={onHide} centered className={styles['delete-booking-modal']}>
+    <Modal show={open} onHide={onClose} centered>
       <Modal.Header closeButton>
-        <Modal.Title>Xác nhận xoá đặt phòng</Modal.Title>
+        <Modal.Title>Xác nhận xóa booking</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>Bạn có chắc chắn muốn xoá đặt phòng của <strong>{booking.customerName}</strong>?</p>
-        <p>Phòng: {booking.roomNumber}</p>
-        <p>Nhận phòng: {booking.checkInDate}</p>
-        <p>Trả phòng: {booking.checkOutDate}</p>
+        <p>Bạn có chắc chắn muốn xóa booking <b>{booking._id}</b> không?</p>
+        {error && <Alert variant="danger">{error}</Alert>}
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>Huỷ</Button>
-        <Button variant="danger" onClick={() => onDelete(booking.id)}>Xoá</Button>
+        <Button variant="secondary" onClick={onClose} disabled={loading}>Huỷ</Button>
+        <Button variant="danger" onClick={handleDelete} disabled={loading}>
+          {loading ? <Spinner animation="border" size="sm" /> : 'Xóa'}
+        </Button>
       </Modal.Footer>
     </Modal>
   );
 };
 
-export default DeleteBookingModal;
+export default DeleteBookingModal; 

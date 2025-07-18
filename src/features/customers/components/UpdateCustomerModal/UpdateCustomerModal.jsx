@@ -31,7 +31,7 @@ const UpdateCustomerModal = ({ show, onHide, customer, onUpdate }) => {
 
   const handleSubmit = e => {
     e.preventDefault();
-    onUpdate({ ...customer, ...form });
+    onUpdate({ ...customer, id: customer._id, ...form });
     onHide();
   };
 

@@ -49,3 +49,10 @@ export const deleteRoom = async (id) =>
       ...getAuthHeader()
     }
   }).then(res => res.data);
+
+export const getRooms = async (token) => {
+  const res = await axios.get(API_URL_ROOMS_LIST, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return res.data;
+};

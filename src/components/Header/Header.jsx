@@ -1,86 +1,93 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, Form, Spinner, Alert } from 'react-bootstrap';
 import styles from './Header.module.scss';
 import { signout } from '../../features/auth/AuthAPI';
 import { UserContext } from '../../context/UserContext';
+import { getEmployeeById, updateEmployee } from '../../features/employees/EmployeeAPI';
 
 const Header = () => {
-  const [open, setOpen] = useState(false);
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const avatarRef = useRef();
-  const navigate = useNavigate();
-  const { user } = useContext(UserContext);
+  const [showModal, setShowModal] = useState(false);
+  const [employee, setEmployee] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const { user, setUser } = useContext(UserContext);
+  const token = user?.token;
 
+  // Lấy thông tin employee khi mở modal
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (avatarRef.current && !avatarRef.current.contains(event.target)) {
-        setOpen(false);
+    const fetchEmployee = async () => {
+      if (showModal && user?._id && token) {
+        setLoading(true);
+        setError('');
+        try {
+          const data = await getEmployeeById(user._id, token); // truyền token vào đây
+          setEmployee(data);
+        } catch (e) {
+          setError('Không thể tải thông tin cá nhân');
+        } finally {
+          setLoading(false);
+        }
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    fetchEmployee();
+  }, [showModal, user, token]);
 
-  const handleProfile = () => {
-    setOpen(false);
-    navigate('/profile');
-  };
-  const handleChangePassword = () => {
-    setOpen(false);
-    navigate('/change-password');
-  };
-  const handleLogout = () => {
-    setOpen(false);
-    setShowLogoutModal(true);
-  };
-  const confirmLogout = async () => {
-    setShowLogoutModal(false);
+  // Đăng xuất
+  const handleLogout = async () => {
+    setShowModal(false);
     try {
       await signout();
     } catch (e) {}
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    navigate('/login');
+    setUser(null);
+    window.location.href = '/login';
   };
 
   return (
     <header className={styles.header}>
-      <div className={styles.left}>
-        {/* Có thể giữ logo nhỏ hoặc bỏ hoàn toàn nếu không cần */}
-        {/* <span className={styles.logo}>HOTEL</span> */}
-      </div>
       <div className={styles.right}>
         <div
           className={styles.avatar}
-          ref={avatarRef}
-          onClick={() => setOpen((v) => !v)}
+          onClick={() => setShowModal(true)}
           tabIndex={0}
           style={{ cursor: 'pointer', position: 'relative' }}
         >
           <span role="img" aria-label="user">👤</span>
-          {open && (
-            <div className={styles.dropdownMenu}>
-              <div className={styles.dropdownItem} onClick={handleProfile}>Thông tin cá nhân</div>
-              <div className={styles.dropdownItem} onClick={handleChangePassword}>Đổi mật khẩu</div>
-              <div className={styles.dropdownItem} style={{ color: '#dc3545' }} onClick={handleLogout}>Đăng xuất</div>
-            </div>
-          )}
         </div>
       </div>
-      <Modal show={showLogoutModal} onHide={() => setShowLogoutModal(false)} centered>
+      {/* Modal thông tin cá nhân */}
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Xác nhận đăng xuất</Modal.Title>
+          <Modal.Title>Thông tin cá nhân</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Bạn có chắc chắn muốn đăng xuất không?</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowLogoutModal(false)}>
-            Huỷ
-          </Button>
-          <Button variant="danger" onClick={confirmLogout}>
-            Đăng xuất
-          </Button>
-        </Modal.Footer>
+        <Modal.Body>
+          {loading ? (
+            <div className="text-center"><Spinner animation="border" /></div>
+          ) : error ? (
+            <Alert variant="danger">{error}</Alert>
+          ) : (
+            <>
+              {/* Luôn hiển thị thông tin cá nhân, ưu tiên employee, fallback sang user context */}
+              <div style={{ fontWeight: 700, fontSize: 18 }}>
+                {(employee?.fullName || user?.fullName || user?.name || 'Không xác định')}
+              </div>
+              <div style={{ color: '#00AEEF', fontWeight: 500 }}>
+                {(employee?.role || user?.role || 'Không xác định')}
+              </div>
+              <div style={{ marginTop: 8 }}><b>Email:</b> {(employee?.email || user?.email || 'Không xác định')}</div>
+              <div><b>Số điện thoại:</b> {(employee?.phone || user?.phone || 'Không xác định')}</div>
+              <Button
+                variant="danger"
+                style={{ marginTop: 18, marginLeft: 12, borderRadius: 6, fontWeight: 500 }}
+                onClick={handleLogout}
+              >
+                Đăng xuất
+              </Button>
+            </>
+          )}
+        </Modal.Body>
       </Modal>
     </header>
   );

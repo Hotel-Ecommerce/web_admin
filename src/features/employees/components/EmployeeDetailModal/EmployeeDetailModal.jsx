@@ -1,25 +1,25 @@
 import React from 'react';
-import { Modal, Button } from 'react-bootstrap';
 import styles from './EmployeeDetailModal.module.scss';
 
-const EmployeeDetailModal = ({ show, onHide, employee }) => {
-  if (!employee) return null;
+const EmployeeDetailModal = ({ open, onClose, employee }) => {
+  if (!open || !employee) return null;
+
   return (
-    <Modal show={show} onHide={onHide} centered className={styles['employee-detail-modal']}>
-      <Modal.Header closeButton>
-        <Modal.Title>Thông tin nhân viên</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p><strong>Họ tên:</strong> {employee.fullName}</p>
-        <p><strong>Vai trò:</strong> {employee.role}</p>
-        <p><strong>Email:</strong> {employee.email}</p>
-        <p><strong>Số điện thoại:</strong> {employee.phone}</p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>Đóng</Button>
-      </Modal.Footer>
-    </Modal>
+    <div className={styles.modalOverlay}>
+      <div className={styles.modal}>
+        <h3>Chi tiết nhân viên</h3>
+        <div className={styles.detailRow}><span>Họ tên:</span> <b>{employee.fullName}</b></div>
+        <div className={styles.detailRow}><span>Email:</span> <b>{employee.email}</b></div>
+        <div className={styles.detailRow}><span>Điện thoại:</span> <b>{employee.phone || '-'}</b></div>
+        <div className={styles.detailRow}><span>Vai trò:</span> <b>{employee.role}</b></div>
+        <div className={styles.detailRow}><span>Ngày tạo:</span> <b>{employee.createdAt ? new Date(employee.createdAt).toLocaleString() : '-'}</b></div>
+        <div className={styles.detailRow}><span>Ngày cập nhật:</span> <b>{employee.updatedAt ? new Date(employee.updatedAt).toLocaleString() : '-'}</b></div>
+        <div className={styles.actions}>
+          <button type="button" onClick={onClose}>Đóng</button>
+        </div>
+      </div>
+    </div>
   );
 };
 
-export default EmployeeDetailModal;
+export default EmployeeDetailModal; 

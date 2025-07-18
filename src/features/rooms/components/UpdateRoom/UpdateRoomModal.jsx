@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Alert, Spinner, Image } from 'react-bootstrap';
 import styles from './UpdateRoomModal.module.scss';
 import { updateRoom } from '../../RoomAPI';
+import CloseModalButton from '../../../../components/CloseModalButton/CloseModalButton';
 
 const UpdateRoomModal = ({ show, onHide, room, setRooms }) => {
   const [form, setForm] = useState({
@@ -86,8 +87,9 @@ const UpdateRoomModal = ({ show, onHide, room, setRooms }) => {
 
   return (
     <Modal show={show} onHide={onHide} centered className={styles['update-room-modal']}>
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title>Cập nhật phòng</Modal.Title>
+        <CloseModalButton onClick={onHide} />
       </Modal.Header>
       <Form onSubmit={handleSubmit}>
         <Modal.Body>

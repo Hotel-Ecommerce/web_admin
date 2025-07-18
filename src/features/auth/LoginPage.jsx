@@ -19,11 +19,10 @@ const LoginPage = () => {
     setLoading(true);
     try {
       const data = await login(email, password);
-      // Giả định backend trả về { token, user: { ... } }
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user || {}));
-      setUser(data.user || null);
-      // Xóa logic redirect về trang trước đó, luôn chuyển về dashboard
+      // Lưu toàn bộ user + token vào localStorage và context
+      localStorage.setItem('user', JSON.stringify(data));
+      if (data.token) localStorage.setItem('token', data.token);
+      setUser(data);
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Đăng nhập thất bại!');
@@ -66,10 +65,6 @@ const LoginPage = () => {
                 <Button type="submit" className="w-100" variant="primary" disabled={loading}>
                   {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
                 </Button>
-                <div className="mt-3 text-center">
-                  <span>Bạn chưa có tài khoản? </span>
-                  <Button variant="link" onClick={() => navigate('/signup')}>Đăng ký</Button>
-                </div>
               </Form>
             </Card.Body>
           </Card>
