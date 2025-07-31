@@ -1,5 +1,9 @@
 export const API_URL = 'http://localhost:7079';
 
+if (process.env.NODE_ENV === 'production') {
+    API_URL = "https://hotel-api.phuongtran.site"
+}
+
 export const API_URL_AUTH = `${API_URL}/auth`;
 export const API_URL_AUTH_LOGIN = `${API_URL}/auth/login`;
 export const API_URL_AUTH_SIGNUP = `${API_URL}/auth/signup`;
