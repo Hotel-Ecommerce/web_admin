@@ -1,31 +1,173 @@
-.employeePage {
-  max-width: 900px;
-  margin: 32px auto;
-  background: #fafbfc;
-  border-radius: 10px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-  padding: 32px 28px 40px 28px;
+.employeePageContainer {
+  padding: 2rem 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
 
-.header {
+.employeeHeader {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  .employeeTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1C1C1E;
+    margin-bottom: 0.5rem;
+  }
+
+  .employeeSubtitle {
+    color: #6C757D;
+    font-size: 1rem;
+    margin: 0;
+  }
 }
 
-.addBtn {
-  background: transparent;
+.statsRow {
+  margin-bottom: 2rem;
+}
+
+.employeeListCard {
   border: none;
-  border-radius: 50%;
-  padding: 8px;
-  cursor: pointer;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+
+  .cardHeader {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 1px solid #dee2e6;
+    padding: 1rem 1.5rem;
+  }
+
+  .cardBody {
+    padding: 0;
+  }
+}
+
+.toolbarContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.searchSection {
+  flex: 1;
+  min-width: 300px;
+  max-width: 500px;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.toolbarBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.18s;
-  font-size: 22px;
+  transition: all 0.3s ease;
+  border: 1px solid #dee2e6;
+  background: white;
+  color: #6c757d;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: #007bff;
+    color: #007bff;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  // Specific button styles
+  &.btn-outline-secondary:hover {
+    border-color: #6c757d;
+    color: #6c757d;
+  }
+
+  &.btn-outline-primary:hover {
+    border-color: #007bff;
+    color: #007bff;
+  }
+
+  &.btn-outline-info:hover {
+    border-color: #17a2b8;
+    color: #17a2b8;
+  }
+
+  &.btn-success:hover {
+    border-color: #28a745;
+    color: #28a745;
+  }
 }
-.addBtn:hover {
-  background: rgba(67, 160, 71, 0.12);
+
+// Responsive design
+@media (max-width: 768px) {
+  .employeePageContainer {
+    padding: 1rem 0;
+  }
+
+  .employeeHeader {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+
+    .employeeTitle {
+      font-size: 1.5rem;
+    }
+  }
+
+  .toolbarContainer {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .searchSection {
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  .actionButtons {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .employeeHeader {
+    .employeeTitle {
+      font-size: 1.3rem;
+    }
+  }
+
+  .toolbarContainer {
+    .searchSection {
+      order: 2;
+    }
+
+    .actionButtons {
+      order: 1;
+      justify-content: space-between;
+      width: 100%;
+    }
+  }
+
+  .toolbarBtn {
+    width: 35px;
+    height: 35px;
+  }
 } 

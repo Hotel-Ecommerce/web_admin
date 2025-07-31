@@ -23,22 +23,75 @@ const AddEmployeeModal = ({ open, onClose, token, onAdded }) => {
     e.preventDefault();
     setError('');
     setSuccess('');
-    if (!form.fullName || !form.email || !form.role || !form.password) {
-      setError('Vui lòng nhập đầy đủ họ tên, email, vai trò và mật khẩu.');
+    
+    // Validation với thông báo chi tiết
+    if (!form.fullName.trim()) {
+      setError('❌ Vui lòng nhập họ tên nhân viên.');
       return;
     }
+    if (!form.email.trim()) {
+      setError('❌ Vui lòng nhập email nhân viên.');
+      return;
+    }
+    if (!form.role) {
+      setError('❌ Vui lòng chọn vai trò cho nhân viên.');
+      return;
+    }
+    if (!form.password.trim()) {
+      setError('❌ Vui lòng nhập mật khẩu cho nhân viên.');
+      return;
+    }
+    if (form.password.length < 6) {
+      setError('❌ Mật khẩu phải có ít nhất 6 ký tự.');
+      return;
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      setError('❌ Email không đúng định dạng. Vui lòng kiểm tra lại.');
+      return;
+    }
+    
+    // Validate phone number (optional but if provided, must be valid)
+    if (form.phone && !/^[0-9+\-\s()]{10,15}$/.test(form.phone)) {
+      setError('❌ Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại đúng định dạng.');
+      return;
+    }
+    
     setLoading(true);
     try {
       await addEmployee(form, token);
-      setSuccess('Thêm nhân viên thành công!');
+      setSuccess(`✅ Thêm nhân viên "${form.fullName}" thành công! 
+      
+📋 Thông tin nhân viên mới:
+• Họ tên: ${form.fullName}
+• Email: ${form.email}
+• Vai trò: ${form.role === 'Manager' ? 'Quản lý' : 'Admin'}
+• Số điện thoại: ${form.phone || 'Chưa cập nhật'}
+
+💡 Nhân viên có thể đăng nhập ngay với email và mật khẩu đã tạo.`);
       setForm({ fullName: '', email: '', phone: '', role: 'Manager', password: '' });
       if (onAdded) onAdded();
       setTimeout(() => {
         setSuccess('');
         onClose();
-      }, 1000);
+      }, 3000);
     } catch (err) {
-      setError('Có lỗi xảy ra khi thêm nhân viên.');
+      console.error('Add employee error:', err);
+      if (err.response?.data?.message) {
+        setError(`❌ ${err.response.data.message}`);
+      } else if (err.response?.status === 409) {
+        setError('❌ Email đã tồn tại trong hệ thống. Vui lòng sử dụng email khác.');
+      } else if (err.response?.status === 400) {
+        setError('❌ Dữ liệu không hợp lệ. Vui lòng kiểm tra lại thông tin.');
+      } else if (err.response?.status === 401) {
+        setError('❌ Không có quyền thêm nhân viên. Vui lòng đăng nhập lại.');
+      } else if (err.response?.status === 500) {
+        setError('❌ Lỗi server. Vui lòng thử lại sau.');
+      } else {
+        setError('❌ Có lỗi xảy ra khi thêm nhân viên. Vui lòng thử lại.');
+      }
     } finally {
       setLoading(false);
     }

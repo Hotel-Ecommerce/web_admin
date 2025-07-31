@@ -1,184 +1,193 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form, Alert, Spinner } from 'react-bootstrap';
+import { Modal, Form, Button, Alert, Spinner } from 'react-bootstrap';
 import { addBooking } from '../../BookingAPI';
+import { queryRooms } from '../../../rooms/RoomAPI';
 import { getCustomers } from '../../../customers/CustomerAPI';
-import { getRooms } from '../../../rooms/RoomAPI';
-import styles from './AddBookingModal.module.scss';
-import { FaTimes } from 'react-icons/fa';
 import CloseModalButton from '../../../../components/CloseModalButton/CloseModalButton';
+import styles from './AddBookingModal.module.scss';
 
-const paymentOptions = [
-  { value: '', label: '--Chọn trạng thái thanh toán--' },
-  { value: 'Paid', label: 'Đã thanh toán' },
-  { value: 'Unpaid', label: 'Chưa thanh toán' },
-  { value: 'Pending', label: 'Chờ xử lý' }
-];
-const statusOptions = [
-  { value: '', label: '--Chọn trạng thái--' },
-  { value: 'Confirmed', label: 'Đã xác nhận' },
-  { value: 'Pending', label: 'Chờ xác nhận' },
-  { value: 'Cancelled', label: 'Đã hủy' },
-  { value: 'Completed', label: 'Hoàn thành' }
-];
-
-const AddBookingModal = ({ open, onClose, token, onAdded }) => {
-  const [form, setForm] = useState({
+const AddBookingModal = ({ show, onHide, onAdd }) => {
+  const [formData, setFormData] = useState({
     customerId: '',
     roomId: '',
     checkInDate: '',
     checkOutDate: '',
-    status: '',
-    paymentStatus: ''
+    numberOfGuests: 1,
+    specialRequests: ''
   });
-  const [customers, setCustomers] = useState([]);
   const [rooms, setRooms] = useState([]);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    if (open && token) {
-      (async () => {
-        try {
-          const [customerList, roomList] = await Promise.all([
-            getCustomers(token),
-            getRooms(token)
-          ]);
-          setCustomers(Array.isArray(customerList) ? customerList : customerList.customers || []);
-          setRooms(Array.isArray(roomList) ? roomList : roomList.rooms || []);
-        } catch {
-          setCustomers([]);
-          setRooms([]);
-        }
-      })();
+    const fetchData = async () => {
+      try {
+        const [roomsData, customersData] = await Promise.all([
+          queryRooms(),
+          getCustomers()
+        ]);
+        setRooms(roomsData);
+        setCustomers(customersData);
+      } catch (err) {
+        setError('Không thể tải dữ liệu');
+      }
+    };
+    if (show) {
+      fetchData();
     }
-  }, [open, token]);
+  }, [show]);
 
-  const handleChange = e => {
-    const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+  const handleClose = () => {
+    setFormData({
+      customerId: '',
+      roomId: '',
+      checkInDate: '',
+      checkOutDate: '',
+      numberOfGuests: 1,
+      specialRequests: ''
+    });
+    setError('');
+    onHide();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
-    if (!form.customerId || !form.roomId || !form.checkInDate || !form.checkOutDate) {
-      setError('Vui lòng nhập đầy đủ thông tin.');
-      return;
-    }
     setLoading(true);
+    setError('');
+
     try {
-      await addBooking(form, token);
-      setSuccess('Thêm booking thành công!');
-      setForm({ customerId: '', roomId: '', checkInDate: '', checkOutDate: '', status: '', paymentStatus: '' });
-      if (onAdded) onAdded();
-      setTimeout(() => {
-        setSuccess('');
-        onClose();
-      }, 1000);
+      await onAdd(formData);
+      handleClose();
     } catch (err) {
-      setError('Có lỗi xảy ra khi thêm booking.');
+      setError(err?.response?.data?.message || 'Có lỗi xảy ra khi tạo booking');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleClose = () => {
-    setError('');
-    setSuccess('');
-    setForm({ customerId: '', roomId: '', checkInDate: '', checkOutDate: '', status: '', paymentStatus: '' });
-    onClose();
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
-  if (!open) return null;
-
   return (
-    <Modal show={open} onHide={handleClose} centered>
+    <Modal show={show} onHide={handleClose} centered size="lg">
       <Modal.Header>
-        <Modal.Title>Thêm booking mới</Modal.Title>
+        <Modal.Title>Tạo booking mới</Modal.Title>
         <CloseModalButton onClick={handleClose} />
       </Modal.Header>
       <Modal.Body>
-        {error && <Alert variant="danger">{error}</Alert>}
-        {success && <Alert variant="success">{success}</Alert>}
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
-            <Form.Label>Khách hàng</Form.Label>
+            <Form.Label>Khách hàng *</Form.Label>
             <Form.Select
               name="customerId"
-              value={form.customerId}
+              value={formData.customerId}
               onChange={handleChange}
               required
+              disabled={loading}
             >
-              <option value="">--Chọn khách hàng--</option>
-              {customers.map(c => (
-                <option key={c._id} value={c._id}>{c.fullName} ({c.email})</option>
+              <option value="">Chọn khách hàng</option>
+              {customers.map(customer => (
+                <option key={customer._id} value={customer._id}>
+                  {customer.fullName} - {customer.phone}
+                </option>
               ))}
             </Form.Select>
           </Form.Group>
+
           <Form.Group className="mb-3">
-            <Form.Label>Phòng</Form.Label>
+            <Form.Label>Phòng *</Form.Label>
             <Form.Select
               name="roomId"
-              value={form.roomId}
+              value={formData.roomId}
               onChange={handleChange}
               required
+              disabled={loading}
             >
-              <option value="">--Chọn phòng--</option>
-              {rooms.map(r => (
-                <option key={r._id} value={r._id}>{r.roomNumber} ({r.type})</option>
+              <option value="">Chọn phòng</option>
+              {rooms.map(room => (
+                <option key={room._id} value={room._id}>
+                  {room.roomNumber} - {room.roomType} - {room.price?.toLocaleString()} VNĐ
+                </option>
               ))}
             </Form.Select>
           </Form.Group>
+
+          <div className="row">
+            <div className="col-md-6">
+              <Form.Group className="mb-3">
+                <Form.Label>Ngày check-in *</Form.Label>
+                <Form.Control
+                  type="date"
+                  name="checkInDate"
+                  value={formData.checkInDate}
+                  onChange={handleChange}
+                  required
+                  disabled={loading}
+                />
+              </Form.Group>
+            </div>
+            <div className="col-md-6">
+              <Form.Group className="mb-3">
+                <Form.Label>Ngày check-out *</Form.Label>
+                <Form.Control
+                  type="date"
+                  name="checkOutDate"
+                  value={formData.checkOutDate}
+                  onChange={handleChange}
+                  required
+                  disabled={loading}
+                />
+              </Form.Group>
+            </div>
+          </div>
+
           <Form.Group className="mb-3">
-            <Form.Label>Ngày nhận</Form.Label>
+            <Form.Label>Số lượng khách *</Form.Label>
             <Form.Control
-              type="date"
-              name="checkInDate"
-              value={form.checkInDate}
+              type="number"
+              name="numberOfGuests"
+              value={formData.numberOfGuests}
               onChange={handleChange}
+              min="1"
               required
+              disabled={loading}
             />
           </Form.Group>
+
           <Form.Group className="mb-3">
-            <Form.Label>Ngày trả</Form.Label>
+            <Form.Label>Yêu cầu đặc biệt</Form.Label>
             <Form.Control
-              type="date"
-              name="checkOutDate"
-              value={form.checkOutDate}
+              as="textarea"
+              rows={3}
+              name="specialRequests"
+              value={formData.specialRequests}
               onChange={handleChange}
-              required
+              disabled={loading}
+              placeholder="Nhập yêu cầu đặc biệt (nếu có)"
             />
           </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Trạng thái</Form.Label>
-            <Form.Select
-              name="status"
-              value={form.status}
-              onChange={handleChange}
-            >
-              {statusOptions.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Thanh toán</Form.Label>
-            <Form.Select
-              name="paymentStatus"
-              value={form.paymentStatus}
-              onChange={handleChange}
-            >
-              {paymentOptions.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-          <div className="text-end">
-            <Button variant="secondary" onClick={handleClose} disabled={loading}>Huỷ</Button>{' '}
-            <Button variant="primary" type="submit" disabled={loading}>
-              {loading ? <Spinner animation="border" size="sm" /> : 'Lưu'}
+
+          {error && <Alert variant="danger">{error}</Alert>}
+
+          <div className="d-flex justify-content-end gap-2">
+            <Button variant="secondary" onClick={handleClose} disabled={loading}>
+              Hủy
+            </Button>
+            <Button type="submit" variant="primary" disabled={loading}>
+              {loading ? (
+                <>
+                  <Spinner size="sm" animation="border" className="me-2" />
+                  Đang tạo...
+                </>
+              ) : (
+                'Tạo booking'
+              )}
             </Button>
           </div>
         </Form>

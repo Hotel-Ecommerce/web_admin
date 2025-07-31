@@ -4,14 +4,13 @@ import styles from './UpdateRoomModal.module.scss';
 import { updateRoom } from '../../RoomAPI';
 import CloseModalButton from '../../../../components/CloseModalButton/CloseModalButton';
 
-const UpdateRoomModal = ({ show, onHide, room, setRooms }) => {
+const UpdateRoomModal = ({ show, onHide, room, setRooms, onSuccess, onError }) => {
   const [form, setForm] = useState({
     roomNumber: '',
     type: '',
     price: '',
     description: '',
     capacity: '',
-    status: '',
   });
   const [images, setImages] = useState([]); // new images (File[])
   const [existingImages, setExistingImages] = useState([]); // urls
@@ -28,7 +27,6 @@ const UpdateRoomModal = ({ show, onHide, room, setRooms }) => {
         price: room.price || '',
         description: room.description || '',
         capacity: room.capacity || '',
-        status: room.status || '',
       });
       setExistingImages(room.images || []);
       setImages([]);
@@ -66,30 +64,58 @@ const UpdateRoomModal = ({ show, onHide, room, setRooms }) => {
       formData.append('price', form.price);
       formData.append('description', form.description);
       formData.append('capacity', form.capacity);
-      formData.append('status', form.status);
       images.forEach((file) => formData.append('images', file));
       removedImageUrls.forEach((url) => formData.append('removedImageUrls', url));
       const updatedRoom = await updateRoom(formData);
       setSuccess('Cập nhật phòng thành công!');
       setRooms(prev => prev.map(r => r._id === room._id ? updatedRoom : r));
+      
+      // Call success callback
+      if (onSuccess) {
+        onSuccess('Cập nhật phòng thành công!');
+      }
+      
       setTimeout(() => {
         setSuccess('');
         onHide();
       }, 1000);
     } catch (err) {
-      setError(err.response?.data?.message || 'Có lỗi xảy ra khi cập nhật phòng.');
+      const errorMessage = err.response?.data?.message || 'Có lỗi xảy ra khi cập nhật phòng.';
+      setError(errorMessage);
+      
+      // Call error callback
+      if (onError) {
+        onError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
   };
 
+  const handleCancel = () => {
+    setError('');
+    setSuccess('');
+    setForm({
+      roomNumber: room?.roomNumber || '',
+      type: room?.type || '',
+      price: room?.price || '',
+      description: room?.description || '',
+      capacity: room?.capacity || '',
+    });
+    setExistingImages(room?.images || []);
+    setImages([]);
+    setRemovedImageUrls([]);
+    setLoading(false);
+    onHide();
+  };
+
   if (!room) return null;
 
   return (
-    <Modal show={show} onHide={onHide} centered className={styles['update-room-modal']}>
+    <Modal show={show} onHide={handleCancel} centered className={styles['update-room-modal']}>
       <Modal.Header>
         <Modal.Title>Cập nhật phòng</Modal.Title>
-        <CloseModalButton onClick={onHide} />
+        <CloseModalButton onClick={handleCancel} />
       </Modal.Header>
       <Form onSubmit={handleSubmit}>
         <Modal.Body>
@@ -108,9 +134,9 @@ const UpdateRoomModal = ({ show, onHide, room, setRooms }) => {
             <Form.Label>Loại phòng</Form.Label>
             <Form.Select name="type" value={form.type} onChange={handleChange} required>
               <option value="">Chọn loại phòng</option>
-              <option value="Standard">Standard</option>
-              <option value="Deluxe">Deluxe</option>
-              <option value="Suite">Suite</option>
+              <option value="Standard">Tiêu chuẩn</option>
+              <option value="Deluxe">Cao cấp</option>
+              <option value="Suite">Hạng sang</option>
             </Form.Select>
           </Form.Group>
           <Form.Group className="mb-3">
@@ -135,28 +161,20 @@ const UpdateRoomModal = ({ show, onHide, room, setRooms }) => {
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Số lượng người tối đa</Form.Label>
-            <Form.Control
+            <Form.Select
               name="capacity"
-              type="number"
               value={form.capacity}
               onChange={handleChange}
               required
-              min={1}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Trạng thái</Form.Label>
-            <Form.Select
-              name="status"
-              value={form.status}
-              onChange={handleChange}
-              required
             >
-              <option value="">-- Chọn trạng thái --</option>
-              <option value="Trống">Trống</option>
-              <option value="Đã đặt">Đã đặt</option>
+              <option value="">Chọn số lượng người</option>
+              <option value="1">1 người</option>
+              <option value="2">2 người</option>
+              <option value="3">3 người</option>
+              <option value="4">4 người</option>
             </Form.Select>
           </Form.Group>
+
           <Form.Group className="mb-3">
             <Form.Label>Hình ảnh hiện tại</Form.Label>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -189,7 +207,7 @@ const UpdateRoomModal = ({ show, onHide, room, setRooms }) => {
           </Form.Group>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={onHide} disabled={loading}>Huỷ</Button>
+          <Button variant="secondary" onClick={handleCancel} disabled={loading}>Huỷ</Button>
           <Button variant="primary" type="submit" disabled={loading}>
             {loading ? <Spinner animation="border" size="sm" /> : 'Lưu'}
           </Button>

@@ -1,23 +1,16 @@
 import React from 'react';
 import { FaTimes } from 'react-icons/fa';
+import styles from './CloseModalButton.module.scss';
 
-const CloseModalButton = ({ onClick, style, ariaLabel = 'Đóng' }) => (
+const CloseModalButton = ({ onClick, style, ariaLabel = 'Đóng', className = '' }) => (
   <button
     type="button"
     onClick={onClick}
     aria-label={ariaLabel}
-    style={{
-      position: 'absolute',
-      right: 16,
-      top: 12,
-      padding: 0,
-      background: 'none',
-      border: 'none',
-      cursor: 'pointer',
-      ...style
-    }}
+    className={`${styles.closeButton} ${className}`}
+    style={style}
   >
-    <FaTimes color="#d32f2f" size={22} />
+    <FaTimes />
   </button>
 );
 

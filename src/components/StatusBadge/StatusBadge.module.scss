@@ -1,0 +1,101 @@
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 600;
+  border-radius: 20px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.badgeIcon {
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.badgeText {
+  font-weight: 600;
+}
+
+// Size variants
+.sm {
+  padding: 0.2rem 0.5rem;
+  font-size: 0.7rem;
+  
+  .badgeIcon {
+    font-size: 0.7rem;
+  }
+}
+
+.md {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  
+  .badgeIcon {
+    font-size: 0.8rem;
+  }
+}
+
+.lg {
+  padding: 0.4rem 1rem;
+  font-size: 0.85rem;
+  
+  .badgeIcon {
+    font-size: 0.9rem;
+  }
+}
+
+.xl {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.9rem;
+  
+  .badgeIcon {
+    font-size: 1rem;
+  }
+}
+
+// Custom colors for specific statuses
+.badge-warning {
+  background-color: #ffc107 !important;
+  color: #212529 !important;
+}
+
+.badge-success {
+  background-color: #28a745 !important;
+  color: white !important;
+}
+
+.badge-danger {
+  background-color: #dc3545 !important;
+  color: white !important;
+}
+
+.badge-info {
+  background-color: #17a2b8 !important;
+  color: white !important;
+}
+
+.badge-secondary {
+  background-color: #6c757d !important;
+  color: white !important;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .statusBadge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+  }
+  
+  .badgeIcon {
+    font-size: 0.75rem;
+  }
+} 

@@ -42,13 +42,26 @@ export const updateRoom = async (formData) => {
   }
 };
 
-export const deleteRoom = async (id) =>
-  axios.post(API_URL_ROOMS_DELETE, { id }, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...getAuthHeader()
+export const deleteRoom = async (id) => {
+  try {
+    const res = await axios.post(API_URL_ROOMS_DELETE, { id }, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    return res.data;
+  } catch (error) {
+    // Xử lý lỗi 501 Not Implemented và __dirname is not defined
+    if (error.response?.status === 501) {
+      throw new Error('Chức năng xóa phòng chưa được triển khai trên server. Vui lòng liên hệ quản trị viên.');
     }
-  }).then(res => res.data);
+    if (error.response?.data?.message?.includes('__dirname is not defined')) {
+      throw new Error('Lỗi cấu hình server. Vui lòng liên hệ quản trị viên.');
+    }
+    throw error.response?.data || error;
+  }
+};
 
 export const getRooms = async (token) => {
   const res = await axios.get(API_URL_ROOMS_LIST, {

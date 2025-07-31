@@ -1,0 +1,187 @@
+.filterModal {
+  .modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.modalHeader {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-bottom: 1px solid #dee2e6;
+  padding: 1.5rem;
+  
+  .modal-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+    color: #495057;
+    font-size: 1.25rem;
+  }
+  
+  .filterIcon {
+    color: #17a2b8;
+  }
+}
+
+.modalBody {
+  padding: 2rem;
+  
+  .formGroup {
+    margin-bottom: 1.5rem;
+    
+    label {
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+  }
+  
+  .formControl {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    
+    &:focus {
+      border-color: #17a2b8;
+      box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.25);
+    }
+  }
+}
+
+.filterSummary {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  
+  h6 {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .activeFilters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .filterTag {
+    background: #17a2b8;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+  
+  .noFilters {
+    color: #6c757d;
+    font-style: italic;
+    font-size: 0.9rem;
+  }
+}
+
+.modalFooter {
+  background: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  .resetBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: #6c757d;
+      border-color: #6c757d;
+      color: white;
+    }
+  }
+  
+  .actionButtons {
+    display: flex;
+    gap: 0.75rem;
+  }
+  
+  .cancelBtn,
+  .applyBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+  }
+  
+  .cancelBtn {
+    &:hover {
+      background: #6c757d;
+      border-color: #6c757d;
+      color: white;
+    }
+  }
+  
+  .applyBtn {
+    background: #17a2b8;
+    border-color: #17a2b8;
+    
+    &:hover {
+      background: #138496;
+      border-color: #138496;
+    }
+    
+    &:disabled {
+      background: #6c757d;
+      border-color: #6c757d;
+      opacity: 0.6;
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .modalBody {
+    padding: 1.5rem;
+    
+    .formGroup {
+      margin-bottom: 1rem;
+    }
+  }
+  
+  .filterSummary {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    
+    .activeFilters {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+  }
+  
+  .modalFooter {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 1rem;
+    
+    .actionButtons {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+} 

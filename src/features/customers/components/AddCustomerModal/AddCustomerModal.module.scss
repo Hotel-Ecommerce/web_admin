@@ -1,25 +1,106 @@
 .add-customer-modal {
   .modal-header {
-    background: #e3fcec;
-    color: #155724;
-  }
-  .modal-body {
-    font-size: 1.1rem;
-    color: #333;
-    .form-label {
-      font-weight: 500;
+    border-bottom: 1px solid #E2E8F0;
+    padding: 2rem 2rem 1.5rem 2rem;
+    
+    .modal-title {
+      font-size: var(--text-xl);
+      font-weight: var(--font-bold);
+      color: #1A202C;
+      line-height: var(--leading-tight);
     }
+  }
+  
+  .modal-body {
+    padding: 2rem;
+    
+    .form-label {
+      font-size: var(--text-sm);
+      font-weight: var(--font-semibold);
+      color: #1A202C;
+      margin-bottom: 0.75rem;
+      line-height: var(--leading-normal);
+    }
+    
     .form-control {
-      border-radius: 6px;
-      border: 1.5px solid #e9ecef;
+      font-size: var(--text-base);
+      font-family: var(--font-family-primary);
+      line-height: var(--leading-normal);
+      border: 2px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      transition: all 0.3s ease;
+      margin-bottom: 1.5rem;
+      
       &:focus {
-        border-color: #00AEEF;
-        box-shadow: 0 0 0 0.2rem rgba(0,174,239,0.15);
+        border-color: #4A55E1;
+        box-shadow: 0 0 0 0.2rem rgba(74, 85, 225, 0.25);
+      }
+      
+      &:disabled {
+        background-color: #F7FAFC;
+        color: #718096;
+      }
+    }
+    
+    .alert {
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
+      line-height: var(--leading-normal);
+      border-radius: 8px;
+      border: none;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      
+      &.alert-danger {
+        background-color: #FED7D7;
+        color: #C53030;
+      }
+      
+      &.alert-success {
+        background-color: #C6F6D5;
+        color: #2F855A;
       }
     }
   }
+  
   .modal-footer {
-    background: #f7f9fc;
-    border-top: 1px solid #e9ecef;
+    border-top: 1px solid #E2E8F0;
+    padding: 1.5rem 2rem 2rem 2rem;
+    
+    .btn {
+      font-size: var(--text-sm);
+      font-weight: var(--font-semibold);
+      padding: 0.875rem 1.75rem;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      line-height: var(--leading-normal);
+      margin-left: 1rem;
+      
+      &.btn-primary {
+        background: #4A55E1;
+        border-color: #4A55E1;
+        
+        &:hover, &:focus {
+          background: #3B46C1;
+          border-color: #3B46C1;
+        }
+        
+        &:disabled {
+          background: #718096;
+          border-color: #718096;
+        }
+      }
+      
+      &.btn-secondary {
+        background: #718096;
+        border-color: #718096;
+        
+        &:hover, &:focus {
+          background: #4A5568;
+          border-color: #4A5568;
+        }
+      }
+    }
   }
 } 

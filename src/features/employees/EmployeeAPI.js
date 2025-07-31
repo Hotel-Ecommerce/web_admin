@@ -1,24 +1,30 @@
-import axios from 'axios';
+import api from '../auth/axiosInstance';
 import {
   API_URL_EMPLOYEES,
   API_URL_EMPLOYEES_LIST,
   API_URL_EMPLOYEES_ADD,
   API_URL_EMPLOYEES_UPDATE,
   API_URL_EMPLOYEES_DELETE,
-  API_URL_EMPLOYEE_BY_ID
+  API_URL_EMPLOYEE_BY_ID,
+  API_URL_EMPLOYEES_RESET_PASSWORD
 } from '../../core/constant/api_constant';
 
 // Lấy danh sách nhân viên
 export const getEmployees = async (token) => {
-  const res = await axios.get(API_URL_EMPLOYEES_LIST, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  return res.data;
+  try {
+    const res = await api.get('/employees/list', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return res.data;
+  } catch (error) {
+    console.error('getEmployees error:', error.response?.data || error.message);
+    throw error;
+  }
 };
 
 // Thêm nhân viên mới
 export const addEmployee = async (data, token) => {
-  const res = await axios.post(API_URL_EMPLOYEES_ADD, data, {
+  const res = await api.post(API_URL_EMPLOYEES_ADD, data, {
     headers: { Authorization: `Bearer ${token}` }
   });
   return res.data;
@@ -26,7 +32,7 @@ export const addEmployee = async (data, token) => {
 
 // Lấy thông tin nhân viên theo ID
 export const getEmployeeById = async (id, token) => {
-  const res = await axios.get(API_URL_EMPLOYEE_BY_ID(id), {
+  const res = await api.get(API_URL_EMPLOYEE_BY_ID(id), {
     headers: { Authorization: `Bearer ${token}` }
   });
   return res.data;
@@ -34,7 +40,7 @@ export const getEmployeeById = async (id, token) => {
 
 // Cập nhật thông tin nhân viên
 export const updateEmployee = async (data, token) => {
-  const res = await axios.post(API_URL_EMPLOYEES_UPDATE, data, {
+  const res = await api.post(API_URL_EMPLOYEES_UPDATE, data, {
     headers: { Authorization: `Bearer ${token}` }
   });
   return res.data;
@@ -42,7 +48,15 @@ export const updateEmployee = async (data, token) => {
 
 // Xóa nhân viên
 export const deleteEmployee = async (id, token) => {
-  const res = await axios.post(API_URL_EMPLOYEES_DELETE, { id }, {
+  const res = await api.post(API_URL_EMPLOYEES_DELETE, { id }, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return res.data;
+};
+
+// Reset mật khẩu nhân viên
+export const resetEmployeePassword = async (id, newPassword, token) => {
+  const res = await api.post(API_URL_EMPLOYEES_RESET_PASSWORD, { id, newPassword }, {
     headers: { Authorization: `Bearer ${token}` }
   });
   return res.data;

@@ -30,12 +30,20 @@ export const API_URL_STATISTICS = `${API_URL}/statistics`;
 export const API_URL_STATISTICS_ADD = `${API_URL}/statistics/add`;
 export const API_URL_STATISTICS_BOOKINGS = `${API_URL}/statistics/bookings`;
 
+// Statistics Dashboard API constants
+export const API_URL_STATISTICS_REVENUE = `${API_URL}/statistics/revenue`;
+export const API_URL_STATISTICS_CUSTOMERS = `${API_URL}/statistics/customers`;
+export const API_URL_STATISTICS_ROOMS = `${API_URL}/statistics/rooms`;
+export const API_URL_STATISTICS_COMPREHENSIVE = `${API_URL}/statistics/comprehensive`;
+export const API_URL_STATISTICS_EXPORT = `${API_URL}/statistics/export`;
+
 export const API_URL_EMPLOYEES = `${API_URL}/employees`;
 export const API_URL_EMPLOYEES_ADD = `${API_URL}/employees/add`;
 export const API_URL_EMPLOYEES_UPDATE = `${API_URL}/employees/update`;
 export const API_URL_EMPLOYEES_DELETE = `${API_URL}/employees/delete`;
 export const API_URL_EMPLOYEES_LIST = `${API_URL}/employees/list`;
 export const API_URL_EMPLOYEE_BY_ID = (id) => `${API_URL}/employees/${id}`;
+export const API_URL_EMPLOYEES_RESET_PASSWORD = `${API_URL}/employees/resetPassword`;
 
 export const API_URL_BOOKINGS = `${API_URL}/bookings`;
 export const API_URL_BOOKINGS_ADD = `${API_URL}/bookings/add`;
@@ -43,4 +51,12 @@ export const API_URL_BOOKINGS_UPDATE = `${API_URL}/bookings/update`;
 export const API_URL_BOOKINGS_DELETE = `${API_URL}/bookings/delete`;
 export const API_URL_BOOKINGS_LIST = `${API_URL}/bookings/list`;
 export const API_URL_BOOKING_BY_ID = (id) => `${API_URL}/bookings/${id}`;
+
+// Change Booking API constants
+export const API_URL_BOOKING_CHANGE_REQUESTS = `${API_URL}/bookings/bookingChangeRequests`;
+export const API_URL_BOOKING_CHANGE_REQUEST_UPDATE = `${API_URL}/bookings/bookingChangeRequests/update`;
+export const API_URL_BOOKING_CHANGE_REQUEST_CANCEL = `${API_URL}/bookings/bookingChangeRequests/cancel`;
+export const API_URL_BOOKING_CHANGE_REQUEST_APPROVE = (id) => `${API_URL}/bookings/bookingChangeRequests/${id}/approve`;
+export const API_URL_BOOKING_CHANGE_REQUEST_DISAPPROVE = (id) => `${API_URL}/bookings/bookingChangeRequests/${id}/disapprove`;
+export const API_URL_BOOKING_MARK_PAID = (id) => `${API_URL}/bookings/markBookingPaid/${id}`;
 

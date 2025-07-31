@@ -59,13 +59,13 @@ const EmployeeFilterModal = ({ onClose, onApply }) => {
           />
         </div>
         <div className={styles.actions}>
-          <button type="button" title="Đặt lại" onClick={handleReset} style={{background:'#eee',color:'#888',marginRight:8,borderRadius:'50%'}}>
+          <button type="button" onClick={handleReset} style={{background:'#eee',color:'#888',marginRight:8,borderRadius:'50%'}}>
             <FaSyncAlt size={16} />
           </button>
-          <button type="button" title="Áp dụng" onClick={handleApply} style={{background:'#43a047',color:'#fff',marginRight:8,borderRadius:'50%'}}>
+          <button type="button" onClick={handleApply} style={{background:'#43a047',color:'#fff',marginRight:8,borderRadius:'50%'}}>
             <FaCheck size={16} />
           </button>
-          <button type="button" title="Đóng" onClick={onClose} style={{background:'#d32f2f',color:'#fff',marginLeft:8,borderRadius:'50%'}}>
+          <button type="button" onClick={onClose} style={{background:'#d32f2f',color:'#fff',marginLeft:8,borderRadius:'50%'}}>
             <FaTimes size={16} />
           </button>
         </div>

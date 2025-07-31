@@ -1,3 +1,78 @@
 .roomTable {
   // Style tuỳ chỉnh cho bảng phòng
+}
+
+.paginationContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding: 1rem 0;
+  border-top: 1px solid #E2E8F0;
+}
+
+.paginationInfo {
+  font-size: 0.875rem;
+  color: #718096;
+  font-weight: 500;
+}
+
+.pagination {
+  margin: 0;
+  
+  .page-link {
+    color: #4A5568;
+    border: 1px solid #E2E8F0;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    
+    &:hover {
+      background-color: #F7FAFC;
+      border-color: #CBD5E0;
+      color: #2D3748;
+    }
+    
+    &:focus {
+      box-shadow: 0 0 0 0.2rem rgba(0, 174, 239, 0.25);
+    }
+  }
+  
+  .page-item.active .page-link {
+    background-color: #00AEEF;
+    border-color: #00AEEF;
+    color: white;
+  }
+  
+  .page-item.disabled .page-link {
+    color: #A0AEC0;
+    background-color: #F7FAFC;
+    border-color: #E2E8F0;
+    cursor: not-allowed;
+  }
+  
+  .page-item:first-child .page-link,
+  .page-item:last-child .page-link {
+    border-radius: 0.375rem;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .paginationContainer {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+  }
+  
+  .paginationInfo {
+    text-align: center;
+  }
+  
+  .pagination {
+    .page-link {
+      padding: 0.375rem 0.5rem;
+      font-size: 0.8rem;
+    }
+  }
 } 

@@ -1,5 +1,5 @@
 // src/features/customers/CustomerAPI.js
-import axios from 'axios';
+import api from '../auth/axiosInstance';
 import {
   API_URL_CUSTOMERS,
   API_URL_CUSTOMERS_ADD,
@@ -17,7 +17,7 @@ const getAuthHeader = () => {
 };
 
 export const queryCustomers = async (params = {}) => {
-  const res = await axios.get(API_URL_CUSTOMERS_LIST, {
+  const res = await api.get(API_URL_CUSTOMERS_LIST, {
     params,
     headers: { ...getAuthHeader() }
   });
@@ -25,34 +25,41 @@ export const queryCustomers = async (params = {}) => {
 };
 
 export const getCustomerById = async (id) => {
-  const res = await axios.get(API_URL_CUSTOMER_BY_ID(id), {
+  const res = await api.get(API_URL_CUSTOMER_BY_ID(id), {
     headers: { ...getAuthHeader() }
   });
   return res.data;
 };
 
 export const updateCustomer = async (customer) => {
-  const res = await axios.post(`${API_URL_CUSTOMERS_UPDATE}`, customer, {
+  const res = await api.post(`${API_URL_CUSTOMERS_UPDATE}`, customer, {
+    headers: { ...getAuthHeader() }
+  });
+  return res.data;
+};
+
+export const addCustomer = async (customer) => {
+  const res = await api.post(`${API_URL_AUTH_SIGNUP}`, customer, {
     headers: { ...getAuthHeader() }
   });
   return res.data;
 };
 
 export const deleteCustomer = async (id) => {
-  const res = await axios.post(`${API_URL_CUSTOMERS_DELETE}`, { id }, {
+  const res = await api.post(`${API_URL_CUSTOMERS_DELETE}`, { id }, {
     headers: { ...getAuthHeader() }
   });
   return res.data;
 };
 
 export const signupCustomer = async (customerData) => {
-  const res = await axios.post(API_URL_AUTH_SIGNUP, customerData);
+  const res = await api.post(API_URL_AUTH_SIGNUP, customerData);
   return res.data;
 };
 
 export const getCustomers = async (token) => {
   if (!token) token = localStorage.getItem('token');
-  const res = await axios.get(API_URL_CUSTOMERS_LIST, {
+  const res = await api.get(API_URL_CUSTOMERS_LIST, {
     headers: token ? { Authorization: `Bearer ${token}` } : {}
   });
   return res.data;

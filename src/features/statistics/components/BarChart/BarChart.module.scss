@@ -1,0 +1,126 @@
+.barChartCard {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  height: 100%;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .card-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    border-radius: 12px 12px 0 0;
+    padding: 1rem 1.5rem;
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+}
+
+.chartTitle {
+  color: #1C1C1E;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chartContainer {
+  position: relative;
+  width: 100%;
+}
+
+.chartPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  color: #6C757D;
+  padding: 2rem;
+
+  .chartIcon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  h6 {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+.chartLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.legendColor {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.legendLabel {
+  color: #495057;
+  font-weight: 500;
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .barChartCard {
+    .card-header {
+      padding: 0.8rem 1rem;
+    }
+
+    .card-body {
+      padding: 1rem;
+    }
+  }
+
+  .chartPlaceholder {
+    padding: 1rem;
+
+    .chartIcon {
+      font-size: 2rem;
+    }
+
+    h6 {
+      font-size: 0.9rem;
+    }
+
+    p {
+      font-size: 0.8rem;
+    }
+  }
+
+  .chartLegend {
+    gap: 0.5rem;
+  }
+
+  .legendItem {
+    font-size: 0.7rem;
+  }
+} 

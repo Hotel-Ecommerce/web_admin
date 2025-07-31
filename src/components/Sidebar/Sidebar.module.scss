@@ -1,65 +1,185 @@
 .sidebar {
-  background: #1E2A38;
-  padding: 2.5rem 1.2rem 1.2rem 1.2rem;
-  min-height: 100vh;
-  width: 240px;
+  background: #F7FAFC;
+  color: #1A202C;
+  width: 220px;
+  height: 100vh;
+  padding: 1.5rem 0.75rem 1.5rem 0.75rem;
+  font-family: var(--font-family-primary);
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
-  box-shadow: 4px 0 32px 0 rgba(30,42,56,0.12);
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.sidebarHeader {
+  margin-bottom: 1rem;
+  text-align: left;
+  flex-shrink: 0;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.sidebarTitle {
+  font-size: 1.1rem;
+  font-weight: var(--font-black);
+  color: #4A55E1;
+  margin-bottom: 0;
+  letter-spacing: 0.05em;
+  background: none;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: unset;
+  background-clip: unset;
+  text-fill-color: unset;
+  text-shadow: none;
+  padding-left: 0.5rem;
+  line-height: var(--leading-tight);
+  margin-bottom: 1.5rem;
 }
 
 .logo {
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 800;
   color: #fff;
   letter-spacing: 1px;
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
   text-align: left;
   padding-left: 0.2rem;
 }
 
-.sidebar :global(.nav-link) {
-  color: #fff;
-  font-size: 1.13rem;
-  font-weight: 600;
-  border-radius: 16px;
-  padding: 1rem 1.2rem;
-  margin-bottom: 0.5rem;
+.sidebarNav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-top: 1rem;
+  padding-right: 0.5rem;
+  padding-bottom: 2rem;
+  
+  // Custom scrollbar
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #E2E8F0;
+    border-radius: 3px;
+    transition: background 0.3s ease;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: #718096;
+  }
+  
+  // Firefox scrollbar
+  scrollbar-width: thin;
+  scrollbar-color: #E2E8F0 transparent;
+  
+  &:hover {
+    scrollbar-color: #718096 transparent;
+  }
+}
+
+.navItem {
   display: flex;
   align-items: center;
-  gap: 1.1rem;
-  transition: background 0.2s, color 0.2s;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.25rem;
+  border-radius: 10px;
+  color: #718096;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: 0.875rem;
+  font-weight: var(--font-medium);
+  line-height: var(--leading-normal);
+  
+  &:hover {
+    background: #EBF0FF;
+    color: #4A55E1;
+    transform: translateX(4px);
+  }
+  
+  &.active {
+    background: #4A55E1;
+    color: white;
+    box-shadow: 0 2px 8px rgba(74, 85, 225, 0.3);
+  }
+  
+  .navIcon {
+    margin-right: 0.75rem;
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+  }
+  
+  .navText {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.sidebar :global(.nav-link) {
+  color: #0f0f0f;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: background 0.18s, color 0.18s;
   text-align: left;
 }
 
 .sidebar :global(.nav-link:hover),
 .sidebar :global(.nav-link):focus {
-  background: #223354;
-  color: #00AEEF !important;
+  background: #f2f2f2;
+  color: #ff0000 !important;
 }
 
 .active {
   font-weight: 700;
-  color: #00AEEF !important;
-  background: #223354;
-  border-radius: 16px;
-  padding: 1rem 1.2rem;
-  box-shadow: 0 4px 16px rgba(0,174,239,0.10);
+  color: #ff0000 !important;
+  background: #f2f2f2;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  box-shadow: none;
   letter-spacing: 0.5px;
   display: flex;
   align-items: center;
-  gap: 1.1rem;
-  transition: background 0.25s, color 0.2s, box-shadow 0.2s;
+  gap: 1rem;
+  transition: background 0.18s, color 0.18s;
 }
 
 .active span, .sidebar :global(.nav-link):hover span {
-  color: #00AEEF !important;
-  font-size: 1.5em;
+  color: #ff0000 !important;
+  font-size: 1rem;
 }
 
 .sidebar :global(.nav-link) span {
-  font-size: 1.5em;
-  color: #fff;
-  transition: color 0.2s;
+  font-size: 1rem;
+  color: inherit;
+  transition: color 0.18s;
+}
+
+/* Smooth scroll behavior */
+.sidebarNav {
+  scroll-behavior: smooth;
+}
+
+/* Prevent text selection during scroll */
+.sidebarNav {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }

@@ -4,9 +4,11 @@ import AddBookingModal from './components/AddBookingModal/AddBookingModal';
 import UpdateBookingModal from './components/UpdateBookingModal/UpdateBookingModal';
 import DeleteBookingModal from './components/DeleteBookingModal/DeleteBookingModal';
 import BookingDetailModal from './components/BookingDetailModal/BookingDetailModal';
+import RequestBookingChangeModal from './components/RequestBookingChangeModal/RequestBookingChangeModal';
 import { UserContext } from '../../context/UserContext';
+import { markBookingPaid } from './BookingAPI';
 import styles from './BookingListPage.module.scss';
-import { FaPlusCircle, FaFilter } from 'react-icons/fa';
+import { FaPlusCircle, FaFilter, FaExchangeAlt } from 'react-icons/fa';
 
 const BookingPage = () => {
   const { user } = useContext(UserContext);
@@ -16,9 +18,20 @@ const BookingPage = () => {
   const [showUpdate, setShowUpdate] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
+  const [showRequestChange, setShowRequestChange] = useState(false);
   const [reload, setReload] = useState(false);
 
   const handleReload = () => setReload(r => !r);
+
+  const handleMarkPaid = async (booking) => {
+    try {
+      await markBookingPaid(booking._id, token);
+      alert('Đã đánh dấu thanh toán thành công!');
+      handleReload();
+    } catch (error) {
+      alert('Có lỗi xảy ra: ' + (error.response?.data?.message || error.message));
+    }
+  };
 
   return (
     <div className={styles.bookingPage}>
@@ -39,6 +52,8 @@ const BookingPage = () => {
         onEdit={booking => { setSelectedBooking(booking); setShowUpdate(true); }}
         onDelete={booking => { setSelectedBooking(booking); setShowDelete(true); }}
         onDetail={booking => { setSelectedBooking(booking); setShowDetail(true); }}
+        onRequestChange={booking => { setSelectedBooking(booking); setShowRequestChange(true); }}
+        onMarkPaid={handleMarkPaid}
       />
       <AddBookingModal
         open={showAdd}
@@ -64,6 +79,12 @@ const BookingPage = () => {
         open={showDetail}
         onClose={() => setShowDetail(false)}
         booking={selectedBooking}
+      />
+      <RequestBookingChangeModal
+        isOpen={showRequestChange}
+        onClose={() => setShowRequestChange(false)}
+        booking={selectedBooking}
+        onSuccess={handleReload}
       />
     </div>
   );

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Alert, Spinner } from 'react-bootstrap';
 import { updateBooking } from '../../BookingAPI';
 import { getCustomers } from '../../../customers/CustomerAPI';
-import { getRooms } from '../../../rooms/RoomAPI';
+import { queryRooms } from '../../../rooms/RoomAPI';
 import styles from './UpdateBookingModal.module.scss';
 
 const paymentOptions = [
@@ -41,7 +41,7 @@ const UpdateBookingModal = ({ open, onClose, booking, token, onUpdated }) => {
         try {
           const [customerList, roomList] = await Promise.all([
             getCustomers(token),
-            getRooms(token)
+            queryRooms(token)
           ]);
           setCustomers(Array.isArray(customerList) ? customerList : customerList.customers || []);
           setRooms(Array.isArray(roomList) ? roomList : roomList.rooms || []);

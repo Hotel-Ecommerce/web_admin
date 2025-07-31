@@ -1,24 +1,28 @@
+import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './features/auth/LoginPage';
 import SignupPage from './features/auth/SignupPage';
 import Dashboard from './features/dashboard/Dashboard';
-import PrivateRoute from './components/PrivateRoute';
-import MainLayout from './layouts/MainLayout';
 import CustomerListPage from './features/customers/CustomerListPage';
 import RoomListPage from './features/rooms/RoomListPage';
 import BookingListPage from './features/bookings/BookingListPage';
-import EmployeeListPage from './features/employees/EmployeeListPage';
-import StatisticsPage from './features/statistics/StatisticsPage';
+import EmployeePage from './features/employees/EmployeePage';
 import ProfilePage from './features/profile/ProfilePage';
 import ChangePasswordPage from './features/profile/ChangePasswordPage';
+import RequestPage from './features/requests/RequestPage';
+import StatisticsDashboard from './features/statistics/StatisticsDashboard';
+import MainLayout from './layouts/MainLayout';
+import PrivateRoute from './components/PrivateRoute';
+import './App.css';
 
 function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
-
       <Route path="/signup" element={<SignupPage />} />
+      
 
+      
       <Route
         path="/dashboard"
         element={
@@ -64,7 +68,7 @@ function App() {
         element={
           <PrivateRoute>
             <MainLayout>
-              <EmployeeListPage />
+              <EmployeePage />
             </MainLayout>
           </PrivateRoute>
         }
@@ -74,7 +78,7 @@ function App() {
         element={
           <PrivateRoute>
             <MainLayout>
-              <StatisticsPage />
+              <StatisticsDashboard />
             </MainLayout>
           </PrivateRoute>
         }
@@ -99,9 +103,17 @@ function App() {
           </PrivateRoute>
         }
       />
-
-      {/* Redirect tất cả route lạ về login */}
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route
+        path="/requests"
+        element={
+          <PrivateRoute>
+            <MainLayout>
+              <RequestPage />
+            </MainLayout>
+          </PrivateRoute>
+        }
+      />
+      <Route path="/" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 }

@@ -1,0 +1,18 @@
+.main-layout {
+  min-height: 100vh;
+  background: #F7FAFC;
+}
+
+.content {
+  margin-left: 240px; /* Width of sidebar */
+  margin-top: 64px; /* Height of header */
+  min-height: calc(100vh - 64px);
+  background: #F7FAFC;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .content {
+    margin-left: 0;
+  }
+}
