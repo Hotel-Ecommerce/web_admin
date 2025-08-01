@@ -36,7 +36,7 @@ const RoomDetailModal = ({ show, onHide, room }) => {
               {room.images.map((image, index) => (
                 <img 
                   key={index}
-                  src={image.startsWith('http') ? image : `http://localhost:7079${image}`}
+                  src={image.startsWith('http') ? image : `https://hotel-api.phuongtran.site${image}`}
                   alt={`Room ${room.roomNumber} - ${index + 1}`}
                   style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px' }}
                 />

@@ -1,8 +1,8 @@
 import axios from 'axios';
-let baseUrl = 'http://localhost:7079';
+let baseUrl = 'https://hotel-api.phuongtran.site';
 
-if (process.env.NODE_ENV === 'production') {
-  baseUrl = "https://hotel-api.phuongtran.site"
+if (process.env.NODE_ENV === 'development') {
+  baseUrl = "http://localhost:7079"
 }
 
 const api = axios.create({

@@ -1,7 +1,7 @@
-export let API_URL = 'http://localhost:7079';
+export let API_URL = 'https://hotel-api.phuongtran.site';
 
-if (process.env.NODE_ENV === 'production') {
-    API_URL = "https://hotel-api.phuongtran.site"
+if (process.env.NODE_ENV === 'development') {
+    API_URL = "http://localhost:7079"
 }
 
 export const API_URL_AUTH = `${API_URL}/auth`;

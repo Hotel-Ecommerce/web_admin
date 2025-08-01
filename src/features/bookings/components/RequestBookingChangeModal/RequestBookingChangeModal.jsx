@@ -35,7 +35,7 @@ const RequestBookingChangeModal = ({ isOpen, onClose, booking, onSuccess }) => {
 
   const fetchRooms = async () => {
     try {
-      const response = await fetch('http://localhost:7079/rooms/list');
+      const response = await fetch('https://hotel-api.phuongtran.site/rooms/list');
       const data = await response.json();
       setRooms(data);
     } catch (error) {

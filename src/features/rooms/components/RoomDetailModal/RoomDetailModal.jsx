@@ -43,7 +43,7 @@ const RoomDetailModal = ({ show, onHide, room }) => {
             {room.images && room.images.length > 0 ? (
               <div style={{ position: 'relative' }}>
                 <img 
-                  src={`http://localhost:7079${room.images[selectedImage]}`}
+                  src={`https://hotel-api.phuongtran.site${room.images[selectedImage]}`}
                   alt={`Phòng ${room.roomNumber}`}
                   style={{
                     width: '100%',
@@ -84,7 +84,7 @@ const RoomDetailModal = ({ show, onHide, room }) => {
                     {room.images.map((img, idx) => (
                       <img 
                         key={idx}
-                        src={`http://localhost:7079${img}`}
+                        src={`https://hotel-api.phuongtran.site${img}`}
                         alt={`Thumbnail ${idx + 1}`}
                         style={{
                           width: '60px',
