@@ -176,7 +176,7 @@ npm run build
 - Thông tin chi tiết
 - Lịch sử đặt phòng
 
-### 👨‍💼 Quản lý Nhân viên (Admin)
+### 👨‍💼 Quản lý Nhân viên (Manager)
 - Danh sách nhân viên
 - Quản lý tài khoản
 - Phân quyền
@@ -199,30 +199,13 @@ npm run build
 - Auto logout khi token hết hạn
 
 ### Phân quyền
-- **Admin**: Toàn quyền truy cập
-- **Quản lý**: Quản lý đặt phòng, phòng, khách hàng
-- **Nhân viên**: Xem và cập nhật đặt phòng
+- **Manager**: Toàn quyền truy cập
+- **Admin**: Quản lý đặt phòng, phòng, khách hàng
 
 ### Bảo mật dữ liệu
 - Validation đầu vào
 - HTTPS enforcement
-
-## 🧪 Kiểm Thử
-
-### Chạy tests
-```bash
-# Chạy tất cả tests
-npm test
-
-# Chạy tests với coverage
-npm run test:coverage
-
-# Chạy tests trong watch mode
-npm test -- --watch
-```
-
-### Cấu trúc tests
-```
+Cấu trúc
 src/
 ├── components/
 │   └── ComponentName/
