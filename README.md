@@ -281,15 +281,7 @@ REACT_APP_API_URL=https://api.hotelmanagement.com/api
 
 ### Commit Convention
 
-```
-feat: tính năng mới
-fix: sửa lỗi
-docs: cập nhật tài liệu
-style: thay đổi style
-refactor: refactor code
-test: thêm tests
-chore: cập nhật build tools
-```
+
 
 ## 📄 Giấy Phép
 
