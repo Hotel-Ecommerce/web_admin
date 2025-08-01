@@ -25,6 +25,7 @@ const RequestFilterModal = ({
   }, [filter]);
 
   const handleInputChange = (field, value) => {
+    console.log('📝 Input changed:', field, '=', value);
     setTempFilter(prev => ({
       ...prev,
       [field]: value
@@ -38,11 +39,14 @@ const RequestFilterModal = ({
       customerId: '',
       dateRange: ''
     };
+    console.log('🔄 Resetting filter:', resetFilter);
     setTempFilter(resetFilter);
     setFilter(resetFilter);
+    onApply(resetFilter); // Gọi onApply để áp dụng reset ngay lập tức
   };
 
   const handleApply = () => {
+    console.log('🔍 Applying filter:', tempFilter);
     setFilter(tempFilter);
     onApply(tempFilter);
     onClose();

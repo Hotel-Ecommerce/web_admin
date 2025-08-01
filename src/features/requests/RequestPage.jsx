@@ -49,6 +49,8 @@ const RequestPage = () => {
   const [showExport, setShowExport] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [hasInitialLoad, setHasInitialLoad] = useState(false);
   
   // Modal states
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -67,19 +69,40 @@ const RequestPage = () => {
   });
 
   useEffect(() => {
-    fetchRequests();
-    fetchCustomers();
+    if (token) {
+      fetchCustomers();
+      setIsInitialized(true);
+    }
   }, [token]);
+
+  // useEffect để load data lần đầu
+  useEffect(() => {
+    if (token && isInitialized && !hasInitialLoad) {
+      console.log('🚀 Initial data load');
+      fetchRequests();
+      setHasInitialLoad(true);
+    }
+  }, [token, isInitialized, hasInitialLoad]);
+
+  // useEffect để theo dõi thay đổi filter
+  useEffect(() => {
+    console.log('🔄 Filter changed:', { filter, token: !!token, isInitialized });
+    if (token && isInitialized && hasInitialLoad) {
+      fetchRequests();
+    }
+  }, [filter, token, isInitialized, hasInitialLoad]);
 
   const fetchRequests = async () => {
     try {
       setLoading(true);
+      console.log('📡 Fetching requests with filter:', filter);
       const data = await getBookingChangeRequests(token, {
         status: filter.status,
         type: filter.type,
         customerId: filter.customerId,
         dateRange: filter.dateRange
       });
+      console.log('📊 Received data:', data.length, 'requests');
       setRequests(data);
       
       // Calculate stats
@@ -121,9 +144,10 @@ const RequestPage = () => {
   };
 
   const handleFilter = (filterValues) => {
+    console.log('🔍 Filter changed:', filterValues);
     setFilter(filterValues);
     setCurrentPage(1);
-    fetchRequests();
+    // fetchRequests() sẽ được gọi tự động bởi useEffect khi filter thay đổi
   };
 
   const handleApprove = async (requestId) => {
