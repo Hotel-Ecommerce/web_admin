@@ -151,15 +151,6 @@ npm start
 # Build cho production
 npm run build
 
-# Chạy tests
-npm test
-
-# Chạy tests với coverage
-npm run test:coverage
-
-# Eject (không khuyến khích)
-npm run eject
-```
 
 ## 🧩 Các Component Chính
 
@@ -214,9 +205,7 @@ npm run eject
 
 ### Bảo mật dữ liệu
 - Validation đầu vào
-- Sanitization dữ liệu
 - HTTPS enforcement
-- XSS protection
 
 ## 🧪 Kiểm Thử
 
@@ -289,18 +278,6 @@ REACT_APP_API_URL=https://api.hotelmanagement.com/api
    # Xóa cache
    npm run build -- --reset-cache
    ```
-
-## 🤝 Đóng Góp
-
-Chúng tôi rất hoan nghênh mọi đóng góp! Vui lòng đọc [CONTRIBUTING.md](CONTRIBUTING.md) để biết thêm chi tiết.
-
-### Quy trình đóng góp
-
-1. **Fork** dự án
-2. **Tạo branch** mới (`git checkout -b feature/TinhNangMoi`)
-3. **Commit** thay đổi (`git commit -m 'feat: thêm tính năng mới'`)
-4. **Push** lên branch (`git push origin feature/TinhNangMoi`)
-5. **Tạo Pull Request**
 
 ### Commit Convention
 
