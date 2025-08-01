@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form, Alert, Spinner } from 'react-bootstrap';
+import { Modal, Button, Form, Alert, Spinner, Row, Col } from 'react-bootstrap';
+import { FaUser, FaBed, FaCalendarAlt, FaCheckCircle, FaCreditCard, FaMoneyBillWave } from 'react-icons/fa';
 import { updateBooking } from '../../BookingAPI';
 import { getCustomers } from '../../../customers/CustomerAPI';
 import { queryRooms } from '../../../rooms/RoomAPI';
@@ -11,6 +12,7 @@ const paymentOptions = [
   { value: 'Unpaid', label: 'Chưa thanh toán' },
   { value: 'Pending', label: 'Chờ xử lý' }
 ];
+
 const statusOptions = [
   { value: '', label: '--Chọn trạng thái--' },
   { value: 'Confirmed', label: 'Đã xác nhận' },
@@ -27,13 +29,16 @@ const UpdateBookingModal = ({ open, onClose, booking, token, onUpdated }) => {
     checkInDate: '',
     checkOutDate: '',
     status: '',
-    paymentStatus: ''
+    paymentStatus: '',
+    numberOfGuests: 1,
+    specialRequests: ''
   });
   const [customers, setCustomers] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState(null);
 
   useEffect(() => {
     if (open && token) {
@@ -62,23 +67,97 @@ const UpdateBookingModal = ({ open, onClose, booking, token, onUpdated }) => {
         checkInDate: booking.checkInDate ? booking.checkInDate.slice(0,10) : '',
         checkOutDate: booking.checkOutDate ? booking.checkOutDate.slice(0,10) : '',
         status: booking.status || '',
-        paymentStatus: booking.paymentStatus || ''
+        paymentStatus: booking.paymentStatus || '',
+        numberOfGuests: booking.numberOfGuests || 1,
+        specialRequests: booking.specialRequests || ''
       });
+      
+      // Set selected room
+      const room = rooms.find(r => r._id === (booking.roomId?._id || booking.roomId));
+      setSelectedRoom(room);
     }
-  }, [booking]);
+  }, [booking, rooms]);
 
   const handleChange = e => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+    
+    // Clear error when user starts typing
+    if (error) setError('');
+    
+    // Update selected room when room changes
+    if (name === 'roomId') {
+      const room = rooms.find(r => r._id === value);
+      setSelectedRoom(room);
+    }
+  };
+
+  const validateForm = () => {
+    if (!form.customerId) {
+      setError('Vui lòng chọn khách hàng');
+      return false;
+    }
+
+    if (!form.roomId) {
+      setError('Vui lòng chọn phòng');
+      return false;
+    }
+
+    if (!form.checkInDate) {
+      setError('Vui lòng chọn ngày check-in');
+      return false;
+    }
+
+    if (!form.checkOutDate) {
+      setError('Vui lòng chọn ngày check-out');
+      return false;
+    }
+
+    const checkIn = new Date(form.checkInDate);
+    const checkOut = new Date(form.checkOutDate);
+
+    if (checkOut <= checkIn) {
+      setError('Ngày check-out phải sau ngày check-in');
+      return false;
+    }
+
+    if (form.numberOfGuests < 1) {
+      setError('Số lượng khách phải ít nhất 1 người');
+      return false;
+    }
+
+    if (selectedRoom && form.numberOfGuests > selectedRoom.capacity) {
+      setError(`Số lượng khách vượt quá sức chứa của phòng (${selectedRoom.capacity} người)`);
+      return false;
+    }
+
+    return true;
+  };
+
+  const calculateDuration = () => {
+    if (!form.checkInDate || !form.checkOutDate) return 0;
+    const start = new Date(form.checkInDate);
+    const end = new Date(form.checkOutDate);
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  const calculateTotalPrice = () => {
+    if (!selectedRoom || !form.checkInDate || !form.checkOutDate) return 0;
+    const duration = calculateDuration();
+    return selectedRoom.price * duration;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
-    if (!form.customerId || !form.roomId || !form.checkInDate || !form.checkOutDate) {
-      setError('Vui lòng nhập đầy đủ thông tin.');
+    
+    if (!validateForm()) {
       return;
     }
+    
     setLoading(true);
     try {
       await updateBooking(form, token);
@@ -87,101 +166,221 @@ const UpdateBookingModal = ({ open, onClose, booking, token, onUpdated }) => {
       setTimeout(() => {
         setSuccess('');
         onClose();
-      }, 1000);
+      }, 2000);
     } catch (err) {
-      setError('Có lỗi xảy ra khi cập nhật booking.');
+      setError(err?.response?.data?.message || 'Có lỗi xảy ra khi cập nhật booking');
     } finally {
       setLoading(false);
     }
   };
 
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('vi-VN').format(price) + ' ₫';
+  };
+
   if (!open) return null;
 
   return (
-    <Modal show={open} onHide={onClose} centered>
+    <Modal show={open} onHide={onClose} centered size="lg" className={styles['update-booking-modal']}>
       <Modal.Header closeButton>
-        <Modal.Title>Cập nhật booking</Modal.Title>
+        <Modal.Title>
+          <FaCalendarAlt className="me-2" />
+          Cập nhật booking
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {error && <Alert variant="danger">{error}</Alert>}
         {success && <Alert variant="success">{success}</Alert>}
+        
         <Form onSubmit={handleSubmit}>
+          <Row>
+            <Col md={6}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <FaUser className="me-2" />
+                  Khách hàng *
+                </Form.Label>
+                <Form.Select
+                  name="customerId"
+                  value={form.customerId}
+                  onChange={handleChange}
+                  required
+                  disabled={loading}
+                >
+                  <option value="">Chọn khách hàng</option>
+                  {customers.map(c => (
+                    <option key={c._id} value={c._id}>
+                      {c.fullName} ({c.email})
+                    </option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <FaBed className="me-2" />
+                  Phòng *
+                </Form.Label>
+                <Form.Select
+                  name="roomId"
+                  value={form.roomId}
+                  onChange={handleChange}
+                  required
+                  disabled={loading}
+                >
+                  <option value="">Chọn phòng</option>
+                  {rooms.map(r => (
+                    <option key={r._id} value={r._id}>
+                      {r.roomNumber} ({r.type}) - {formatPrice(r.price)}
+                    </option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <FaCalendarAlt className="me-2" />
+                  Ngày check-in *
+                </Form.Label>
+                <Form.Control
+                  type="date"
+                  name="checkInDate"
+                  value={form.checkInDate}
+                  onChange={handleChange}
+                  required
+                  disabled={loading}
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <FaCalendarAlt className="me-2" />
+                  Ngày check-out *
+                </Form.Label>
+                <Form.Control
+                  type="date"
+                  name="checkOutDate"
+                  value={form.checkOutDate}
+                  onChange={handleChange}
+                  required
+                  disabled={loading}
+                  min={form.checkInDate}
+                />
+              </Form.Group>
+            </Col>
+
+            <Col md={6}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <FaCheckCircle className="me-2" />
+                  Trạng thái booking
+                </Form.Label>
+                <Form.Select
+                  name="status"
+                  value={form.status}
+                  onChange={handleChange}
+                  disabled={loading}
+                >
+                  {statusOptions.map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <FaCreditCard className="me-2" />
+                  Trạng thái thanh toán
+                </Form.Label>
+                <Form.Select
+                  name="paymentStatus"
+                  value={form.paymentStatus}
+                  onChange={handleChange}
+                  disabled={loading}
+                >
+                  {paymentOptions.map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Số lượng khách</Form.Label>
+                <Form.Control
+                  type="number"
+                  name="numberOfGuests"
+                  value={form.numberOfGuests}
+                  onChange={handleChange}
+                  min="1"
+                  max={selectedRoom?.capacity || 10}
+                  disabled={loading}
+                />
+                {selectedRoom && (
+                  <Form.Text className="text-muted">
+                    Sức chứa phòng: {selectedRoom.capacity} người
+                  </Form.Text>
+                )}
+              </Form.Group>
+
+              {form.checkInDate && form.checkOutDate && selectedRoom && (
+                <div className="mb-3 p-3 bg-light rounded">
+                  <h6 className="mb-2">
+                    <FaMoneyBillWave className="me-2" />
+                    Thông tin giá
+                  </h6>
+                  <div className="d-flex justify-content-between mb-1">
+                    <small>Giá phòng/đêm:</small>
+                    <small>{formatPrice(selectedRoom.price)}</small>
+                  </div>
+                  <div className="d-flex justify-content-between mb-1">
+                    <small>Số đêm:</small>
+                    <small>{calculateDuration()} đêm</small>
+                  </div>
+                  <hr />
+                  <div className="d-flex justify-content-between">
+                    <strong>Tổng tiền:</strong>
+                    <strong>{formatPrice(calculateTotalPrice())}</strong>
+                  </div>
+                </div>
+              )}
+            </Col>
+          </Row>
+
           <Form.Group className="mb-3">
-            <Form.Label>Khách hàng</Form.Label>
-            <Form.Select
-              name="customerId"
-              value={form.customerId}
-              onChange={handleChange}
-              required
-            >
-              <option value="">--Chọn khách hàng--</option>
-              {customers.map(c => (
-                <option key={c._id} value={c._id}>{c.fullName} ({c.email})</option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Phòng</Form.Label>
-            <Form.Select
-              name="roomId"
-              value={form.roomId}
-              onChange={handleChange}
-              required
-            >
-              <option value="">--Chọn phòng--</option>
-              {rooms.map(r => (
-                <option key={r._id} value={r._id}>{r.roomNumber} ({r.type})</option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Ngày nhận</Form.Label>
+            <Form.Label>Yêu cầu đặc biệt</Form.Label>
             <Form.Control
-              type="date"
-              name="checkInDate"
-              value={form.checkInDate}
+              as="textarea"
+              rows={3}
+              name="specialRequests"
+              value={form.specialRequests}
               onChange={handleChange}
-              required
+              disabled={loading}
+              placeholder="Nhập yêu cầu đặc biệt (nếu có)"
             />
           </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Ngày trả</Form.Label>
-            <Form.Control
-              type="date"
-              name="checkOutDate"
-              value={form.checkOutDate}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Trạng thái</Form.Label>
-            <Form.Select
-              name="status"
-              value={form.status}
-              onChange={handleChange}
-            >
-              {statusOptions.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Thanh toán</Form.Label>
-            <Form.Select
-              name="paymentStatus"
-              value={form.paymentStatus}
-              onChange={handleChange}
-            >
-              {paymentOptions.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-          <div className="text-end">
-            <Button variant="secondary" onClick={onClose} disabled={loading}>Huỷ</Button>{' '}
+
+          <Alert variant="info">
+            <strong>💡 Lưu ý:</strong>
+            <ul className="mb-0 mt-2">
+              <li>Thay đổi trạng thái sẽ gửi thông báo cho khách hàng</li>
+              <li>Thay đổi ngày check-in/out có thể ảnh hưởng đến giá</li>
+              <li>Booking đã hoàn thành không thể chỉnh sửa</li>
+            </ul>
+          </Alert>
+
+          <div className="d-flex justify-content-end gap-2">
+            <Button variant="secondary" onClick={onClose} disabled={loading}>
+              Hủy
+            </Button>
             <Button variant="primary" type="submit" disabled={loading}>
-              {loading ? <Spinner animation="border" size="sm" /> : 'Lưu'}
+              {loading ? (
+                <>
+                  <Spinner size="sm" animation="border" className="me-2" />
+                  Đang cập nhật...
+                </>
+              ) : (
+                'Cập nhật'
+              )}
             </Button>
           </div>
         </Form>

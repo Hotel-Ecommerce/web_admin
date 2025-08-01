@@ -20,7 +20,7 @@ const CustomModal = ({
       centered={centered}
       className={className}
     >
-      <Modal.Header>
+      <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
         <CloseModalButton onClick={onHide} />
       </Modal.Header>

@@ -151,7 +151,7 @@ const ExportDataModal = ({
 
   return (
     <Modal show={show} onHide={onHide} size="lg" centered>
-      <Modal.Header className={styles.modalHeader}>
+      <Modal.Header closeButton className={styles.modalHeader}>
         <Modal.Title>
           <div className={styles.titleContent}>
             <FaDownload className={styles.exportIcon} />

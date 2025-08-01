@@ -115,7 +115,7 @@ const RoomFilterModal = ({ show, onHide, onApplyFilters, onResetFilters, current
 
   return (
     <Modal show={show} onHide={onHide} size="lg" centered>
-      <Modal.Header>
+      <Modal.Header closeButton>
         <Modal.Title>
           <span>🔍 Bộ lọc phòng</span>
           {getActiveFiltersCount() > 0 && (

@@ -85,7 +85,7 @@ const CustomerFilterModal = ({ show, onHide, onApplyFilters, onResetFilters, cur
 
   return (
     <Modal show={show} onHide={onHide} size="lg" centered>
-      <Modal.Header>
+      <Modal.Header closeButton>
         <Modal.Title>
           <span>🔍 Bộ lọc khách hàng</span>
           {getActiveFiltersCount() > 0 && (

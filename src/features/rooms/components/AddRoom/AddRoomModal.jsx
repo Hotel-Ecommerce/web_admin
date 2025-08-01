@@ -23,16 +23,51 @@ const AddRoomModal = ({ show, onHide, setRooms, onSuccess, onError }) => {
   };
 
   const handleImageChange = (e) => {
-    setImages([...e.target.files]);
+    const files = Array.from(e.target.files);
+    
+    // Validate file types
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const invalidFiles = files.filter(file => !validTypes.includes(file.type));
+    
+    if (invalidFiles.length > 0) {
+      setError('Chỉ chấp nhận file ảnh: JPG, PNG, WEBP');
+      return;
+    }
+    
+    // Validate file size (max 5MB per file)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    const oversizedFiles = files.filter(file => file.size > maxSize);
+    
+    if (oversizedFiles.length > 0) {
+      setError('Kích thước file không được vượt quá 5MB');
+      return;
+    }
+    
+    // Validate total number of files (max 5 images)
+    if (files.length > 5) {
+      setError('Tối đa chỉ được chọn 5 hình ảnh');
+      return;
+    }
+    
+    setImages(files);
+    setError('');
   };
 
   const handleSave = async () => {
     setError('');
     setSuccess('');
-    if (!form.roomNumber || !form.type || !form.price || !form.capacity || images.length === 0) {
-      setError('Vui lòng điền đầy đủ thông tin và chọn ít nhất một hình ảnh.');
+    
+    // Validation
+    if (!form.roomNumber || !form.type || !form.price || !form.capacity) {
+      setError('Vui lòng điền đầy đủ thông tin bắt buộc.');
       return;
     }
+    
+    if (images.length === 0) {
+      setError('Vui lòng chọn ít nhất một hình ảnh cho phòng.');
+      return;
+    }
+    
     setLoading(true);
     const formData = new FormData();
     formData.append('roomNumber', form.roomNumber);
@@ -88,7 +123,7 @@ const AddRoomModal = ({ show, onHide, setRooms, onSuccess, onError }) => {
 
   return (
     <Modal show={show} onHide={handleClose} centered className={styles['add-room-modal']}>
-      <Modal.Header>
+      <Modal.Header closeButton>
         <Modal.Title>Thêm phòng mới</Modal.Title>
         <CloseModalButton onClick={handleClose} />
       </Modal.Header>
@@ -97,7 +132,7 @@ const AddRoomModal = ({ show, onHide, setRooms, onSuccess, onError }) => {
         {success && <Alert variant="success">{success}</Alert>}
         <Form>
           <Form.Group className="mb-3">
-            <Form.Label>Số phòng</Form.Label>
+            <Form.Label>Số phòng *</Form.Label>
             <Form.Control
               type="text"
               name="roomNumber"
@@ -107,7 +142,7 @@ const AddRoomModal = ({ show, onHide, setRooms, onSuccess, onError }) => {
             />
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Loại phòng</Form.Label>
+            <Form.Label>Loại phòng *</Form.Label>
             <Form.Select name="type" value={form.type} onChange={handleChange} required>
               <option value="">Chọn loại phòng</option>
               <option value="Standard">Tiêu chuẩn</option>
@@ -116,13 +151,14 @@ const AddRoomModal = ({ show, onHide, setRooms, onSuccess, onError }) => {
             </Form.Select>
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Giá (VNĐ)</Form.Label>
+            <Form.Label>Giá (VNĐ) *</Form.Label>
             <Form.Control
               type="number"
               name="price"
               value={form.price}
               onChange={handleChange}
               required
+              min={0}
             />
           </Form.Group>
           <Form.Group className="mb-3">
@@ -135,7 +171,7 @@ const AddRoomModal = ({ show, onHide, setRooms, onSuccess, onError }) => {
             />
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Số lượng người tối đa</Form.Label>
+            <Form.Label>Số lượng người tối đa *</Form.Label>
             <Form.Select
               name="capacity"
               value={form.capacity}
@@ -150,13 +186,24 @@ const AddRoomModal = ({ show, onHide, setRooms, onSuccess, onError }) => {
             </Form.Select>
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Hình ảnh</Form.Label>
+            <Form.Label>Hình ảnh *</Form.Label>
             <Form.Control
               type="file"
               multiple
+              accept="image/*"
               onChange={handleImageChange}
               required
             />
+            <Form.Text className="text-muted">
+              Chấp nhận: JPG, PNG, WEBP. Tối đa 5MB mỗi file, tối đa 5 hình ảnh.
+            </Form.Text>
+            {images.length > 0 && (
+              <div className="mt-2">
+                <small className="text-success">
+                  Đã chọn {images.length} hình ảnh
+                </small>
+              </div>
+            )}
           </Form.Group>
         </Form>
       </Modal.Body>

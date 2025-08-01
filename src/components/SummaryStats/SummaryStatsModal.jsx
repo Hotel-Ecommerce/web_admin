@@ -267,7 +267,7 @@ const SummaryStatsModal = ({
       className={styles.summaryStatsModal}
       centered
     >
-      <Modal.Header className={styles.modalHeader}>
+      <Modal.Header closeButton className={styles.modalHeader}>
         <div className={styles.modalTitleContainer}>
           <Modal.Title>
             <FaChartLine className="me-2" />

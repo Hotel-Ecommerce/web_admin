@@ -6,6 +6,7 @@ import { API_URL } from '../../../../core/constant/api_constant';
 
 const RoomDetailModal = ({ show, onHide, room }) => {
   const [selectedImage, setSelectedImage] = useState(0);
+  const [imageError, setImageError] = useState(false);
 
   if (!room) return null;
 
@@ -31,6 +32,20 @@ const RoomDetailModal = ({ show, onHide, room }) => {
     }
   };
 
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return null;
+    // Nếu imagePath đã là full URL thì sử dụng trực tiếp
+    if (imagePath.startsWith('http')) {
+      return imagePath;
+    }
+    // Nếu là relative path thì thêm base URL
+    return `${API_URL}${imagePath}`;
+  };
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
   return (
     <Modal show={show} onHide={onHide} size="lg" centered className={styles.roomDetailModal}>
       <Modal.Header closeButton>
@@ -40,10 +55,10 @@ const RoomDetailModal = ({ show, onHide, room }) => {
         <Row>
           <Col md={8}>
             {/* Hình ảnh chính */}
-            {room.images && room.images.length > 0 ? (
+            {room.images && room.images.length > 0 && !imageError ? (
               <div style={{ position: 'relative' }}>
                 <img 
-                  src={`https://hotel-api.phuongtran.site${room.images[selectedImage]}`}
+                  src={getImageUrl(room.images[selectedImage])}
                   alt={`Phòng ${room.roomNumber}`}
                   style={{
                     width: '100%',
@@ -51,27 +66,8 @@ const RoomDetailModal = ({ show, onHide, room }) => {
                     objectFit: 'cover',
                     borderRadius: '12px'
                   }}
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'flex';
-                  }}
+                  onError={handleImageError}
                 />
-                <div style={{
-                  position: 'absolute',
-                  top: '0',
-                  left: '0',
-                  width: '100%',
-                  height: '100%',
-                  background: '#f8f9fa',
-                  display: 'none',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#6c757d',
-                  fontSize: '2rem',
-                  borderRadius: '12px'
-                }}>
-                  📷
-                </div>
                 
                 {/* Thumbnails */}
                 {room.images.length > 1 && (
@@ -84,7 +80,7 @@ const RoomDetailModal = ({ show, onHide, room }) => {
                     {room.images.map((img, idx) => (
                       <img 
                         key={idx}
-                        src={`https://hotel-api.phuongtran.site${img}`}
+                        src={getImageUrl(img)}
                         alt={`Thumbnail ${idx + 1}`}
                         style={{
                           width: '60px',
@@ -185,8 +181,8 @@ const RoomDetailModal = ({ show, onHide, room }) => {
                         {new Date(booking.start).toLocaleDateString('vi-VN')} - {new Date(booking.end).toLocaleDateString('vi-VN')}
                       </div>
                     ))}
-          </div>
-        </div>
+                  </div>
+                </div>
               )}
             </div>
           </Col>

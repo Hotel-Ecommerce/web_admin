@@ -366,6 +366,43 @@ const BookingListPage = () => {
         onMarkPaid={handleMarkPaid}
       />
 
+      {/* Empty State */}
+      {!loading && bookings.length === 0 && (
+        <div className="text-center py-5">
+          <div style={{
+            width: '120px',
+            height: '120px',
+            background: '#f8f9fa',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 2rem',
+            fontSize: '3rem',
+            color: '#6c757d'
+          }}>
+            📅
+          </div>
+          <h4 className="text-muted mb-3">Không có booking nào</h4>
+          <p className="text-muted mb-4">
+            {searchTerm || Object.values(filter).some(v => v !== '' && v !== 'all') 
+              ? 'Không tìm thấy booking nào phù hợp với bộ lọc hiện tại.'
+              : 'Chưa có booking nào trong hệ thống. Hãy tạo booking đầu tiên!'
+            }
+          </p>
+          {!searchTerm && Object.values(filter).every(v => v === '' || v === 'all') && (
+            <Button 
+              variant="primary" 
+              size="lg"
+              onClick={() => setShowAdd(true)}
+            >
+              <FaPlusCircle className="me-2" />
+              Tạo booking đầu tiên
+            </Button>
+          )}
+        </div>
+      )}
+
       {/* Modals */}
       <BookingFilterModal 
         show={showFilter} 

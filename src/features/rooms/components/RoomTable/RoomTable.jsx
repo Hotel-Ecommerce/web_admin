@@ -132,7 +132,9 @@ const RoomTable = ({ columns, data, loading }) => {
           ...item,
           _paginationIndex: indexOfFirstItem + index
         }))} 
-        loading={loading} 
+        loading={loading}
+        emptyMessage="Không có phòng nào trong hệ thống."
+        loadingMessage="Đang tải danh sách phòng..."
       />
       
       {/* Pagination */}

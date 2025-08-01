@@ -10,6 +10,7 @@ import styles from './RoomListPage.module.scss';
 import UpdateRoomModal from './components/UpdateRoom/UpdateRoomModal';
 import RoomDetailModal from './components/RoomDetailModal/RoomDetailModal';
 import RoomFilterModal from './components/RoomFilterModal/RoomFilterModal';
+import DeleteRoomModal from './components/DeleteRoom/DeleteRoomModal';
 import { StatCard } from '../../components';
 
 const RoomListPage = () => {
@@ -24,6 +25,8 @@ const RoomListPage = () => {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [showUpdate, setShowUpdate] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [activeFilters, setActiveFilters] = useState(() => {
     const savedFilters = localStorage.getItem('roomFilters');
     return savedFilters ? JSON.parse(savedFilters) : {
@@ -49,7 +52,6 @@ const RoomListPage = () => {
   // Warning state for delete functionality
   const [showDeleteWarning, setShowDeleteWarning] = useState(false);
   
-
 
   // Fetch room list from backend
   useEffect(() => {
@@ -305,34 +307,38 @@ const RoomListPage = () => {
 
   // Xoá phòng khỏi backend và cập nhật danh sách
   const handleDelete = async (id) => {
-    const confirm = window.confirm('Bạn có chắc muốn xoá phòng này?');
-    if (confirm) {
-      try {
-        await deleteRoom(id);
-        setRooms(prev => prev.filter(r => r._id !== id));
-        // Cập nhật stats sau khi xóa
-        setStats(prev => ({
-          ...prev,
-          total: prev.total - 1
-        }));
-        showToastNotification('Xóa phòng thành công!', 'success');
-      } catch (err) {
-        console.error('Error deleting room:', err);
-        
-        // Xử lý lỗi cụ thể
-        let errorMessage = 'Có lỗi xảy ra khi xoá phòng.';
-        
-        if (err.message) {
-          errorMessage = err.message;
-        } else if (err.response?.data?.message) {
-          errorMessage = err.response.data.message;
-        } else if (err.response?.status === 501) {
-          errorMessage = 'Chức năng xóa phòng chưa được triển khai trên server.';
-          setShowDeleteWarning(true); // Hiển thị cảnh báo
-        }
-        
-        showToastNotification(errorMessage, 'error');
+    setDeleting(true);
+    try {
+      await deleteRoom(id);
+      setRooms(prev => prev.filter(r => r._id !== id));
+      setShowDelete(false);
+      setSelectedRoom(null);
+      
+      // Cập nhật stats sau khi xóa
+      setStats(prev => ({
+        ...prev,
+        total: prev.total - 1
+      }));
+      
+      showToastNotification('Xóa phòng thành công!', 'success');
+    } catch (err) {
+      console.error('Error deleting room:', err);
+      
+      // Xử lý lỗi cụ thể
+      let errorMessage = 'Có lỗi xảy ra khi xoá phòng.';
+      
+      if (err.message) {
+        errorMessage = err.message;
+      } else if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.response?.status === 501) {
+        errorMessage = 'Chức năng xóa phòng chưa được triển khai trên server.';
+        setShowDeleteWarning(true); // Hiển thị cảnh báo
       }
+      
+      showToastNotification(errorMessage, 'error');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -344,7 +350,7 @@ const RoomListPage = () => {
       setSelectedRoom(room);
       setShowDetail(true);
     } catch (err) {
-      alert('Không thể lấy thông tin phòng.');
+      showToastNotification('Không thể lấy thông tin phòng.', 'error');
     } finally {
       setLoading(false);
     }
@@ -482,7 +488,7 @@ const RoomListPage = () => {
               fontSize: '0.85rem'
             }} 
             size="sm" 
-            onClick={() => handleDelete(row._id)}
+            onClick={() => { setSelectedRoom(row); setShowDelete(true); }}
             onMouseOver={e => e.currentTarget.style.background = '#c82333'}
             onMouseOut={e => e.currentTarget.style.background = '#dc3545'}
           >
@@ -596,6 +602,15 @@ const RoomListPage = () => {
         show={showDetail}
         onHide={() => setShowDetail(false)}
         room={selectedRoom}
+      />
+      
+      {/* Delete Room Modal */}
+      <DeleteRoomModal
+        show={showDelete}
+        onHide={() => setShowDelete(false)}
+        room={selectedRoom}
+        onDelete={handleDelete}
+        loading={deleting}
       />
       
       {/* Filter Modal */}

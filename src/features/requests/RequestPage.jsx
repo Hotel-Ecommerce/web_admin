@@ -58,6 +58,13 @@ const RequestPage = () => {
   const [showDisapproveModal, setShowDisapproveModal] = useState(false);
   const [disapproveReason, setDisapproveReason] = useState('');
   
+  // Notification states
+  const [notification, setNotification] = useState({
+    show: false,
+    type: '',
+    message: ''
+  });
+  
   // Stats
   const [stats, setStats] = useState({
     total: 0,
@@ -124,6 +131,7 @@ const RequestPage = () => {
     } catch (err) {
       setError('Lỗi khi tải danh sách yêu cầu');
       console.error('Error fetching requests:', err);
+      showNotification('danger', '❌ Có lỗi xảy ra khi tải danh sách yêu cầu');
     } finally {
       setLoading(false);
     }
@@ -147,7 +155,40 @@ const RequestPage = () => {
     console.log('🔍 Filter changed:', filterValues);
     setFilter(filterValues);
     setCurrentPage(1);
+    
+    // Thông báo khi áp dụng filter
+    const hasFilters = Object.values(filterValues).some(value => value !== '');
+    if (hasFilters) {
+      showNotification('info', '🔍 Đã áp dụng bộ lọc!');
+    }
+    
     // fetchRequests() sẽ được gọi tự động bởi useEffect khi filter thay đổi
+  };
+
+  const handleRefresh = async () => {
+    try {
+      await fetchRequests();
+      showNotification('info', '🔄 Đã làm mới dữ liệu thành công!');
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+    }
+  };
+
+  const showNotification = (type, message) => {
+    setNotification({
+      show: true,
+      type,
+      message
+    });
+    
+    // Tự động ẩn thông báo sau 5 giây
+    setTimeout(() => {
+      setNotification({
+        show: false,
+        type: '',
+        message: ''
+      });
+    }, 5000);
   };
 
   const handleApprove = async (requestId) => {
@@ -159,9 +200,10 @@ const RequestPage = () => {
           : req
       ));
       fetchRequests(); // Refresh to update stats
+      showNotification('success', '✅ Phê duyệt yêu cầu thành công!');
     } catch (err) {
       console.error('Error approving request:', err);
-      alert('Có lỗi xảy ra khi phê duyệt yêu cầu');
+      showNotification('danger', '❌ Có lỗi xảy ra khi phê duyệt yêu cầu');
     }
   };
 
@@ -176,15 +218,17 @@ const RequestPage = () => {
       setShowDisapproveModal(false);
       setDisapproveReason('');
       fetchRequests(); // Refresh to update stats
+      showNotification('warning', '⚠️ Đã từ chối yêu cầu thành công!');
     } catch (err) {
       console.error('Error disapproving request:', err);
-      alert('Có lỗi xảy ra khi từ chối yêu cầu');
+      showNotification('danger', '❌ Có lỗi xảy ra khi từ chối yêu cầu');
     }
   };
 
   const handleViewDetail = (request) => {
     setSelectedRequest(request);
     setShowDetailModal(true);
+    showNotification('info', '👁️ Đang xem chi tiết yêu cầu...');
   };
 
   const getStatusBadge = (status) => {
@@ -211,32 +255,33 @@ const RequestPage = () => {
     }
   };
 
-  // Filter and paginate requests
+  // Calculate pagination
+  const totalPages = Math.ceil(requests.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentRequests = requests.slice(startIndex, endIndex);
+
+  // Filter requests based on search and filter
   const filteredRequests = requests.filter(request => {
-    const searchLower = searchTerm.toLowerCase();
-    const customerName = request.user?.fullName || '';
-    const customerEmail = request.user?.email || '';
-    const bookingId = request.bookingId?._id || '';
+    const matchesSearch = !searchTerm || 
+      request.user?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      request.user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      request.bookingId?._id?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    return customerName.toLowerCase().includes(searchLower) ||
-           customerEmail.toLowerCase().includes(searchLower) ||
-           bookingId.toLowerCase().includes(searchLower);
+    const matchesStatus = !filter.status || request.status === filter.status;
+    const matchesType = !filter.type || request.type === filter.type;
+    const matchesCustomer = !filter.customerId || request.user?._id === filter.customerId;
+    
+    return matchesSearch && matchesStatus && matchesType && matchesCustomer;
   });
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentRequests = filteredRequests.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
-
+  // Export columns configuration
   const exportColumns = [
-    { key: 'customerName', header: 'Khách hàng', accessor: 'user.fullName' },
-    { key: 'customerEmail', header: 'Email', accessor: 'user.email' },
-    { key: 'type', header: 'Loại yêu cầu', accessor: 'type' },
-    { key: 'status', header: 'Trạng thái', accessor: 'status' },
-    { key: 'roomNumber', header: 'Phòng', accessor: 'room.roomNumber' },
-    { key: 'checkInDate', header: 'Ngày check-in', accessor: 'bookingId.checkInDate' },
-    { key: 'checkOutDate', header: 'Ngày check-out', accessor: 'bookingId.checkOutDate' },
-    { key: 'createdAt', header: 'Ngày tạo', accessor: 'createdAt' }
+    { key: 'customerName', label: 'Khách hàng' },
+    { key: 'type', label: 'Loại yêu cầu' },
+    { key: 'bookingId', label: 'Mã booking' },
+    { key: 'status', label: 'Trạng thái' },
+    { key: 'createdAt', label: 'Ngày tạo' }
   ];
 
   const handleCustomExport = (exportConfig) => {
@@ -265,8 +310,10 @@ const RequestPage = () => {
     
     if (format === 'csv') {
       exportToCSV(exportConfig);
+      showNotification('success', '📄 Đã xuất dữ liệu thành file CSV!');
     } else if (format === 'excel') {
       exportToExcel(exportConfig);
+      showNotification('success', '📊 Đã xuất dữ liệu thành file Excel!');
     }
   };
 
@@ -311,7 +358,7 @@ const RequestPage = () => {
       saveAs(file, `${fileName}.xlsx`);
     } catch (error) {
       console.error('Excel export error:', error);
-      alert('Không thể xuất file Excel. Vui lòng thử xuất CSV!');
+      showNotification('warning', '⚠️ Không thể xuất file Excel. Vui lòng thử xuất CSV!');
     }
   };
 
@@ -319,23 +366,35 @@ const RequestPage = () => {
   if (error) return <Alert variant="danger">{error}</Alert>;
 
   return (
-    <Container fluid className={styles.requestPageContainer}>
+    <Container fluid className={styles.requestPage}>
       {/* Header */}
-      <div className={styles.requestHeader}>
-        <div>
-          <h2 className={styles.requestTitle}>Quản lý yêu cầu thay đổi</h2>
-          <p className={styles.requestSubtitle}>Xử lý các yêu cầu thay đổi và hủy đặt phòng</p>
-        </div>
+      <div className={styles.header}>
+        <h1>Quản lý yêu cầu thay đổi</h1>
+        <p className={styles.subtitle}>
+          Xem xét và xử lý các yêu cầu thay đổi booking từ khách hàng
+        </p>
       </div>
 
+      {/* Notification Alert */}
+      {notification.show && (
+        <Alert 
+          variant={notification.type} 
+          dismissible 
+          onClose={() => setNotification({ show: false, type: '', message: '' })}
+          className="mb-3"
+        >
+          {notification.message}
+        </Alert>
+      )}
+
       {/* Stats Cards */}
-      <Row className={styles.statsRow}>
+      <Row className={styles.statsContainer}>
         <Col md={2} sm={6} xs={12} className="mb-3">
           <StatCard
-            title="Tổng yêu cầu"
+            title="Tổng cộng"
             value={stats.total}
-            icon={<FaBell />}
-            color="#00AEEF"
+            icon={<FaExchangeAlt />}
+            color="#007bff"
           />
         </Col>
         <Col md={2} sm={6} xs={12} className="mb-3">
@@ -380,261 +439,225 @@ const RequestPage = () => {
         </Col>
       </Row>
 
-      {/* Request List with Toolbar */}
-      <Card className={styles.requestListCard}>
-        <Card.Header className={styles.cardHeader}>
-          <div className={styles.toolbarContainer}>
-            <div className={styles.searchSection}>
-              <SearchBox
-                placeholder="Tìm kiếm theo tên khách hàng, email, mã booking..."
-                value={searchTerm}
-                onChange={setSearchTerm}
-                onSearch={handleSearch}
-                debounceMs={500}
-              />
-            </div>
+      {/* Controls */}
+      <div className={styles.controlsContainer}>
+        <Row>
+          <Col md={8}>
+            <SearchBox
+              placeholder="Tìm kiếm theo tên khách hàng, email, mã booking..."
+              value={searchTerm}
+              onChange={setSearchTerm}
+              onSearch={handleSearch}
+              debounceMs={500}
+            />
+          </Col>
+          <Col md={4}>
             <div className={styles.actionButtons}>
               <Button 
                 variant="outline-secondary" 
                 size="sm" 
-                onClick={fetchRequests}
-                className={styles.toolbarBtn}
+                onClick={handleRefresh}
               >
-                <FaRedo />
+                <FaRedo className="me-2" />
+                Làm mới
               </Button>
               <Button 
                 variant="outline-primary" 
                 size="sm" 
                 onClick={() => setShowExport(true)}
-                className={styles.toolbarBtn}
               >
-                <FaDownload />
+                <FaDownload className="me-2" />
+                Xuất dữ liệu
               </Button>
               <Button 
                 variant="outline-info" 
                 size="sm" 
                 onClick={() => setShowFilter(true)}
-                className={styles.toolbarBtn}
               >
-                <FaFilter />
+                <FaFilter className="me-2" />
+                Bộ lọc
               </Button>
             </div>
-          </div>
-        </Card.Header>
-        <Card.Body className={styles.cardBody}>
-          {/* Active Filters Display */}
-          {Object.values(filter).some(value => value !== '') && (
-            <div className={styles.activeFiltersDisplay}>
-              <div className={styles.filterLabel}>
-                <FaFilter size={14} />
-                Bộ lọc đang áp dụng:
-              </div>
-              <div className={styles.filterTags}>
-                {filter.status && (
-                  <span className={styles.filterTag}>
-                    Trạng thái: {filter.status === 'Pending' ? 'Chờ xử lý' : 
-                                 filter.status === 'Approved' ? 'Đã phê duyệt' : 'Đã từ chối'}
-                    <button 
-                      onClick={() => handleFilter({...filter, status: ''})}
-                      className={styles.removeFilter}
-                    >
-                      ×
-                    </button>
-                  </span>
-                )}
-                {filter.type && (
-                  <span className={styles.filterTag}>
-                    Loại: {filter.type === 'Update' ? 'Thay đổi' : 'Hủy'}
-                    <button 
-                      onClick={() => handleFilter({...filter, type: ''})}
-                      className={styles.removeFilter}
-                    >
-                      ×
-                    </button>
-                  </span>
-                )}
-                {filter.customerId && (
-                  <span className={styles.filterTag}>
-                    Khách hàng: {customers.find(c => c._id === filter.customerId)?.fullName || 'N/A'}
-                    <button 
-                      onClick={() => handleFilter({...filter, customerId: ''})}
-                      className={styles.removeFilter}
-                    >
-                      ×
-                    </button>
-                  </span>
-                )}
-                {filter.dateRange && (
-                  <span className={styles.filterTag}>
-                    Thời gian: {filter.dateRange === 'today' ? 'Hôm nay' :
-                                filter.dateRange === 'week' ? 'Tuần này' :
-                                filter.dateRange === 'month' ? 'Tháng này' :
-                                filter.dateRange === 'quarter' ? 'Quý này' : 'Năm nay'}
-                    <button 
-                      onClick={() => handleFilter({...filter, dateRange: ''})}
-                      className={styles.removeFilter}
-                    >
-                      ×
-                    </button>
-                  </span>
-                )}
-                <button 
-                  onClick={() => handleFilter({status: '', type: '', customerId: '', dateRange: ''})}
-                  className={styles.clearAllFilters}
-                >
-                  Xóa tất cả
-                </button>
-              </div>
-            </div>
-          )}
-          {/* Table */}
-          <div className={styles.tableContainer}>
-            <Table responsive hover className={styles.table}>
-              <thead className={styles.tableHeader}>
-                <tr>
-                  <th>STT</th>
-                  <th>Khách hàng</th>
-                  <th>Loại yêu cầu</th>
-                  <th>Thông tin booking</th>
-                  <th>Thay đổi yêu cầu</th>
-                  <th>Trạng thái</th>
-                  <th>Ngày tạo</th>
-                  <th>Hành động</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentRequests.map((request, idx) => (
-                  <tr key={request._id} className={styles.tableRow}>
-                    <td>{(currentPage - 1) * itemsPerPage + idx + 1}</td>
-                    <td>
-                      <div className={styles.customerInfo}>
-                        <div className={styles.customerName}>
-                          {request.user?.fullName || 'N/A'}
-                        </div>
-                        <div className={styles.customerEmail}>
-                          {request.user?.email || 'N/A'}
-                        </div>
-                        <div className={styles.customerPhone}>
-                          {request.user?.phone || 'N/A'}
-                        </div>
-                      </div>
-                    </td>
-                    <td>{getTypeBadge(request.type)}</td>
-                    <td>
-                      <div className={styles.bookingInfo}>
-                        <div className={styles.roomNumber}>
-                          Phòng: {request.room?.roomNumber || 'N/A'}
-                        </div>
-                        <div className={styles.dates}>
-                          {formatDate(request.bookingId?.checkInDate)} - {formatDate(request.bookingId?.checkOutDate)}
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <div className={styles.changesInfo}>
-                        {request.type === 'Update' ? (
-                          <>
-                            <div>Phòng mới: {request.requestedRoomId?.roomNumber || 'N/A'}</div>
-                            <div>Ngày mới: {formatDate(request.requestedCheckInDate)} - {formatDate(request.requestedCheckOutDate)}</div>
-                          </>
-                        ) : (
-                          <div>Lý do: {request.cancellationReason || 'N/A'}</div>
-                        )}
-                      </div>
-                    </td>
-                    <td>{getStatusBadge(request.status)}</td>
-                    <td>
-                      <div className={styles.dateInfo}>
-                        <FaCalendar className={styles.dateIcon} />
-                        {formatDate(request.createdAt)}
-                      </div>
-                    </td>
-                    <td className={styles.actions}>
-                      <Button 
-                        variant="outline-info" 
-                        size="sm" 
-                        onClick={() => handleViewDetail(request)}
-                        className={styles.actionBtn}
-                      >
-                        <FaEye />
-                      </Button>
-                      {request.status === 'Pending' && (
-                        <>
-                          <Button 
-                            variant="outline-success" 
-                            size="sm" 
-                            onClick={() => handleApprove(request._id)}
-                            className={styles.actionBtn}
-                          >
-                            <FaCheck />
-                          </Button>
-                          <Button 
-                            variant="outline-danger" 
-                            size="sm" 
-                            onClick={() => {
-                              setSelectedRequest(request);
-                              setShowDisapproveModal(true);
-                            }}
-                            className={styles.actionBtn}
-                          >
-                            <FaTimes />
-                          </Button>
-                        </>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </div>
+          </Col>
+        </Row>
+      </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className={styles.paginationContainer}>
-              <Pagination className={styles.pagination}>
-                <Pagination.First 
-                  onClick={() => setCurrentPage(1)}
-                  disabled={currentPage === 1}
-                />
-                <Pagination.Prev 
-                  onClick={() => setCurrentPage(currentPage - 1)}
-                  disabled={currentPage === 1}
-                />
-                
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                  <Pagination.Item
-                    key={page}
-                    active={page === currentPage}
-                    onClick={() => setCurrentPage(page)}
-                  >
-                    {page}
-                  </Pagination.Item>
-                ))}
-                
-                <Pagination.Next 
-                  onClick={() => setCurrentPage(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                />
-                <Pagination.Last 
-                  onClick={() => setCurrentPage(totalPages)}
-                  disabled={currentPage === totalPages}
-                />
-              </Pagination>
+      {/* Requests Table */}
+      <Card className={styles.tableCard}>
+        <Card.Body className={styles.tableBody}>
+          {loading ? (
+            <div className={styles.loadingContainer}>
+              <LoadingSpinner text="Đang tải dữ liệu..." />
             </div>
-          )}
-
-          {/* Empty state */}
-          {filteredRequests.length === 0 && (
-            <div className={styles.emptyState}>
-              <FaBell size={48} className="text-muted mb-3" />
-              <h4>Không có yêu cầu nào</h4>
-              <p>
-                {searchTerm 
-                  ? `Không có yêu cầu nào phù hợp với "${searchTerm}"`
-                  : 'Chưa có yêu cầu thay đổi nào trong hệ thống'
+          ) : requests.length === 0 ? (
+            <div className="text-center py-5">
+              <div style={{
+                width: '120px',
+                height: '120px',
+                background: '#f8f9fa',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 2rem',
+                fontSize: '3rem',
+                color: '#6c757d'
+              }}>
+                📋
+              </div>
+              <h4 className="text-muted mb-3">Không có yêu cầu nào</h4>
+              <p className="text-muted mb-4">
+                {searchTerm || Object.values(filter).some(v => v !== '' && v !== 'all') 
+                  ? 'Không tìm thấy yêu cầu nào phù hợp với bộ lọc hiện tại.'
+                  : 'Chưa có yêu cầu thay đổi booking nào trong hệ thống.'
                 }
               </p>
+              {!searchTerm && Object.values(filter).every(v => v === '' || v === 'all') && (
+                <div className="d-flex justify-content-center gap-2">
+                  <Button 
+                    variant="primary" 
+                    onClick={handleRefresh}
+                  >
+                    <FaRedo className="me-2" />
+                    Làm mới
+                  </Button>
+                </div>
+              )}
             </div>
+          ) : (
+            <>
+              <div className={styles.tableContainer}>
+                <Table responsive hover className={styles.requestsTable}>
+                  <thead className={styles.tableHeader}>
+                    <tr>
+                      <th>Khách hàng</th>
+                      <th>Loại yêu cầu</th>
+                      <th>Booking</th>
+                      <th>Ngày tạo</th>
+                      <th>Trạng thái</th>
+                      <th>Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentRequests.map((request) => (
+                      <tr key={request._id} className={styles.tableRow}>
+                        <td>
+                          <div className={styles.customerInfo}>
+                            <div className={styles.customerName}>
+                              {request.user?.fullName || 'N/A'}
+                            </div>
+                            <div className={styles.customerEmail}>
+                              {request.user?.email || 'N/A'}
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <div className={styles.typeInfo}>
+                            {getTypeBadge(request.type)}
+                          </div>
+                        </td>
+                        <td>
+                          <div className={styles.bookingInfo}>
+                            <div className={styles.bookingId}>
+                              {request.bookingId?._id || 'N/A'}
+                            </div>
+                            <div className={styles.roomInfo}>
+                              Phòng: {request.room?.roomNumber || 'N/A'}
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <div className={styles.dateInfo}>
+                            {formatDate(request.createdAt)}
+                          </div>
+                        </td>
+                        <td>
+                          <div className={styles.statusInfo}>
+                            {getStatusBadge(request.status)}
+                          </div>
+                        </td>
+                        <td>
+                          <div className={styles.actionButtons}>
+                            <Button
+                              size="sm"
+                              variant="outline-primary"
+                              onClick={() => handleViewDetail(request)}
+                              className={styles.actionBtn}
+                            >
+                              <FaEye />
+                            </Button>
+                            {request.status === 'Pending' && (
+                              <>
+                                <Button
+                                  size="sm"
+                                  variant="outline-success"
+                                  onClick={() => handleApprove(request._id)}
+                                  className={styles.actionBtn}
+                                >
+                                  <FaCheck />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline-danger"
+                                  onClick={() => {
+                                    setSelectedRequest(request);
+                                    setShowDisapproveModal(true);
+                                  }}
+                                  className={styles.actionBtn}
+                                >
+                                  <FaTimes />
+                                </Button>
+                              </>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className={styles.paginationContainer}>
+                  <Pagination className={styles.pagination}>
+                    <Pagination.First
+                      onClick={() => setCurrentPage(1)}
+                      disabled={currentPage === 1}
+                    />
+                    <Pagination.Prev
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    />
+                    
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .filter(page => {
+                        const start = Math.max(1, currentPage - 2);
+                        const end = Math.min(totalPages, currentPage + 2);
+                        return page >= start && page <= end;
+                      })
+                      .map(page => (
+                        <Pagination.Item
+                          key={page}
+                          active={page === currentPage}
+                          onClick={() => setCurrentPage(page)}
+                        >
+                          {page}
+                        </Pagination.Item>
+                      ))}
+                    
+                    <Pagination.Next
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    />
+                    <Pagination.Last
+                      onClick={() => setCurrentPage(totalPages)}
+                      disabled={currentPage === totalPages}
+                    />
+                  </Pagination>
+                </div>
+              )}
+            </>
           )}
         </Card.Body>
       </Card>
