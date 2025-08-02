@@ -30,13 +30,6 @@ export const API_URL_STATISTICS = `${API_URL}/statistics`;
 export const API_URL_STATISTICS_ADD = `${API_URL}/statistics/add`;
 export const API_URL_STATISTICS_BOOKINGS = `${API_URL}/statistics/bookings`;
 
-// Statistics Dashboard API constants
-export const API_URL_STATISTICS_REVENUE = `${API_URL}/statistics/revenue`;
-export const API_URL_STATISTICS_CUSTOMERS = `${API_URL}/statistics/customers`;
-export const API_URL_STATISTICS_ROOMS = `${API_URL}/statistics/rooms`;
-export const API_URL_STATISTICS_COMPREHENSIVE = `${API_URL}/statistics/comprehensive`;
-export const API_URL_STATISTICS_EXPORT = `${API_URL}/statistics/export`;
-
 export const API_URL_EMPLOYEES = `${API_URL}/employees`;
 export const API_URL_EMPLOYEES_ADD = `${API_URL}/employees/add`;
 export const API_URL_EMPLOYEES_UPDATE = `${API_URL}/employees/update`;

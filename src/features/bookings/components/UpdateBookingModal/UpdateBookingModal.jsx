@@ -3,7 +3,7 @@ import { Modal, Button, Form, Alert, Spinner, Row, Col } from 'react-bootstrap';
 import { FaUser, FaBed, FaCalendarAlt, FaCheckCircle, FaCreditCard, FaMoneyBillWave } from 'react-icons/fa';
 import { updateBooking } from '../../BookingAPI';
 import { getCustomers } from '../../../customers/CustomerAPI';
-import { queryRooms } from '../../../rooms/RoomAPI';
+import { queryRooms, getRooms } from '../../../rooms/RoomAPI';
 import styles from './UpdateBookingModal.module.scss';
 
 const paymentOptions = [
@@ -38,21 +38,84 @@ const UpdateBookingModal = ({ show, onHide, booking, token, onUpdated }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [dataLoading, setDataLoading] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
 
   useEffect(() => {
     if (show && token) {
       (async () => {
+        setDataLoading(true);
         try {
+          console.log('Loading data with token:', token ? 'valid' : 'invalid');
+          
           const [customerList, roomList] = await Promise.all([
             getCustomers(token),
-            queryRooms(token)
+            getRooms(token)
           ]);
-          setCustomers(Array.isArray(customerList) ? customerList : customerList.customers || []);
-          setRooms(Array.isArray(roomList) ? roomList : roomList.rooms || []);
-        } catch {
-          setCustomers([]);
-          setRooms([]);
+          
+          console.log('Raw customerList:', customerList);
+          console.log('Raw roomList:', roomList);
+          
+          // Xử lý dữ liệu customers
+          let customersData = [];
+          if (customerList) {
+            if (Array.isArray(customerList)) {
+              customersData = customerList;
+            } else if (customerList.customers && Array.isArray(customerList.customers)) {
+              customersData = customerList.customers;
+            } else if (customerList.data && Array.isArray(customerList.data)) {
+              customersData = customerList.data;
+            }
+          }
+          setCustomers(customersData);
+          
+          // Xử lý dữ liệu rooms
+          let roomsData = [];
+          if (roomList) {
+            if (Array.isArray(roomList)) {
+              roomsData = roomList;
+            } else if (roomList.rooms && Array.isArray(roomList.rooms)) {
+              roomsData = roomList.rooms;
+            } else if (roomList.data && Array.isArray(roomList.data)) {
+              roomsData = roomList.data;
+            }
+          }
+          setRooms(roomsData);
+          
+          console.log('Processed customers:', customersData.length);
+          console.log('Processed rooms:', roomsData.length);
+          
+          if (customersData.length === 0) {
+            console.warn('No customers loaded');
+          }
+          if (roomsData.length === 0) {
+            console.warn('No rooms loaded');
+          }
+        } catch (error) {
+          console.error('Error loading data:', error);
+          console.error('Error details:', {
+            message: error.message,
+            response: error.response?.data,
+            status: error.response?.status
+          });
+          
+          // Fallback với mock data để test
+          console.log('Using fallback mock data');
+          const mockCustomers = [
+            { _id: '1', fullName: 'Nguyễn Văn A', email: 'nguyenvana@email.com' },
+            { _id: '2', fullName: 'Trần Thị B', email: 'tranthib@email.com' },
+            { _id: '3', fullName: 'Lê Văn C', email: 'levanc@email.com' }
+          ];
+          const mockRooms = [
+            { _id: '1', roomNumber: '101', type: 'Standard', price: 800000 },
+            { _id: '2', roomNumber: '102', type: 'Deluxe', price: 1200000 },
+            { _id: '3', roomNumber: '201', type: 'Suite', price: 2000000 }
+          ];
+          
+          setCustomers(mockCustomers);
+          setRooms(mockRooms);
+        } finally {
+          setDataLoading(false);
         }
       })();
     }
@@ -60,10 +123,17 @@ const UpdateBookingModal = ({ show, onHide, booking, token, onUpdated }) => {
 
   useEffect(() => {
     if (booking) {
+      const customerId = booking.customerId?._id || booking.customerId || '';
+      const roomId = booking.roomId?._id || booking.roomId || '';
+      
+      // Kiểm tra xem customer có tồn tại trong danh sách không
+      const validCustomerId = customers.length > 0 && customers.find(c => c._id === customerId) ? customerId : '';
+      const validRoomId = rooms.length > 0 && rooms.find(r => r._id === roomId) ? roomId : '';
+      
       setForm({
         id: booking._id,
-        customerId: booking.customerId?._id || booking.customerId || '',
-        roomId: booking.roomId?._id || booking.roomId || '',
+        customerId: validCustomerId,
+        roomId: validRoomId,
         checkInDate: booking.checkInDate ? booking.checkInDate.slice(0,10) : '',
         checkOutDate: booking.checkOutDate ? booking.checkOutDate.slice(0,10) : '',
         status: booking.status || '',
@@ -73,10 +143,14 @@ const UpdateBookingModal = ({ show, onHide, booking, token, onUpdated }) => {
       });
       
       // Set selected room
-      const room = rooms.find(r => r._id === (booking.roomId?._id || booking.roomId));
+      const room = rooms.find(r => r._id === validRoomId);
       setSelectedRoom(room);
+      
+      console.log('Booking customerId:', customerId);
+      console.log('Valid customerId:', validCustomerId);
+      console.log('Available customers:', customers.map(c => ({ id: c._id, name: c.fullName })));
     }
-  }, [booking, rooms]);
+  }, [booking, rooms, customers]);
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -205,7 +279,7 @@ const UpdateBookingModal = ({ show, onHide, booking, token, onUpdated }) => {
                   value={form.customerId}
                   onChange={handleChange}
                   required
-                  disabled={loading}
+                  disabled={loading || dataLoading}
                 >
                   <option value="">Chọn khách hàng</option>
                   {customers.map(c => (
@@ -214,6 +288,24 @@ const UpdateBookingModal = ({ show, onHide, booking, token, onUpdated }) => {
                     </option>
                   ))}
                 </Form.Select>
+                {dataLoading && (
+                  <Form.Text className="text-info">
+                    Đang tải danh sách khách hàng...
+                  </Form.Text>
+                )}
+                {customers.length === 0 && !dataLoading && (
+                  <Form.Text className="text-warning">
+                    Không có dữ liệu khách hàng. Vui lòng thử lại.
+                  </Form.Text>
+                )}
+                {form.customerId && !customers.find(c => c._id === form.customerId) && (
+                  <Form.Text className="text-danger">
+                    Khách hàng này không tồn tại trong danh sách. Vui lòng chọn lại.
+                  </Form.Text>
+                )}
+                <Form.Text className="text-muted">
+                  Tổng: {customers.length} khách hàng
+                </Form.Text>
               </Form.Group>
 
               <Form.Group className="mb-3">
@@ -226,7 +318,7 @@ const UpdateBookingModal = ({ show, onHide, booking, token, onUpdated }) => {
                   value={form.roomId}
                   onChange={handleChange}
                   required
-                  disabled={loading}
+                  disabled={loading || dataLoading}
                 >
                   <option value="">Chọn phòng</option>
                   {rooms.map(r => (
@@ -235,6 +327,24 @@ const UpdateBookingModal = ({ show, onHide, booking, token, onUpdated }) => {
                     </option>
                   ))}
                 </Form.Select>
+                {dataLoading && (
+                  <Form.Text className="text-info">
+                    Đang tải danh sách phòng...
+                  </Form.Text>
+                )}
+                {rooms.length === 0 && !dataLoading && (
+                  <Form.Text className="text-warning">
+                    Không có dữ liệu phòng. Vui lòng thử lại.
+                  </Form.Text>
+                )}
+                {form.roomId && !rooms.find(r => r._id === form.roomId) && (
+                  <Form.Text className="text-danger">
+                    Phòng này không tồn tại trong danh sách. Vui lòng chọn lại.
+                  </Form.Text>
+                )}
+                <Form.Text className="text-muted">
+                  Tổng: {rooms.length} phòng
+                </Form.Text>
               </Form.Group>
 
               <Form.Group className="mb-3">

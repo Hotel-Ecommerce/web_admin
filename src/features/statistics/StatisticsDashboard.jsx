@@ -129,7 +129,7 @@ const StatisticsDashboard = () => {
           groupBy: 'day'
         };
         
-        // Fetch all statistics
+        // Fetch all statistics using the new API
         const allStats = await getAllStatistics(user.token, apiParams);
         
         // Set booking stats for charts
