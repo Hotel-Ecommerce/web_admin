@@ -178,7 +178,7 @@ const UpdateBookingModal = ({ show, onHide, booking, token, onUpdated }) => {
     return new Intl.NumberFormat('vi-VN').format(price) + ' ₫';
   };
 
-  if (!open) return null;
+  if (!show) return null;
 
   return (
     <Modal show={show} onHide={onHide} centered size="lg" className={styles['update-booking-modal']}>
