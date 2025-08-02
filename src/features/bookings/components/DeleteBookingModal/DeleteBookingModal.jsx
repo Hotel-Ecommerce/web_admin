@@ -223,7 +223,7 @@ const DeleteBookingModal = ({ show, onHide, booking, token, onDeleted }) => {
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={onClose} disabled={loading}>
+                    <Button variant="secondary" onClick={onHide} disabled={loading}>
           Hủy
         </Button>
         <Button 

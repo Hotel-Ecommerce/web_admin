@@ -4,8 +4,8 @@ import { FaCalendarAlt, FaUser, FaBed, FaMoneyBillWave, FaCreditCard, FaClock, F
 import styles from './BookingDetailModal.module.scss';
 import { formatDate } from '../../../../utils/dateUtils';
 
-const BookingDetailModal = ({ open, onClose, booking }) => {
-  if (!open || !booking) return null;
+const BookingDetailModal = ({ show, onHide, booking }) => {
+  if (!show || !booking) return null;
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('vi-VN').format(price) + ' ₫';
@@ -57,7 +57,7 @@ const BookingDetailModal = ({ open, onClose, booking }) => {
   };
 
   return (
-    <Modal show={open} onHide={onClose} size="lg" centered className={styles['booking-detail-modal']}>
+    <Modal show={show} onHide={onHide} size="lg" centered className={styles['booking-detail-modal']}>
       <Modal.Header closeButton>
         <Modal.Title>
           <FaCalendarAlt className="me-2" />
@@ -279,7 +279,7 @@ const BookingDetailModal = ({ open, onClose, booking }) => {
         </Row>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>
+        <Button variant="secondary" onClick={onHide}>
           Đóng
         </Button>
       </Modal.Footer>

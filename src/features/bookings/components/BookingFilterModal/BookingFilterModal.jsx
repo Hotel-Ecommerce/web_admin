@@ -29,7 +29,7 @@ const priceRangeOptions = [
   { value: '2000000+', label: 'Trên 2,000,000 VNĐ' }
 ];
 
-const BookingFilterModal = ({ show, onClose, filter, setFilter }) => {
+const BookingFilterModal = ({ show, onHide, filter, setFilter }) => {
   const [localFilter, setLocalFilter] = useState(filter || {});
   const [customers, setCustomers] = useState([]);
   const [rooms, setRooms] = useState([]);
@@ -60,7 +60,7 @@ const BookingFilterModal = ({ show, onClose, filter, setFilter }) => {
 
   const handleApply = () => {
     setFilter(localFilter);
-    onClose();
+    onHide();
   };
 
   const handleClear = () => {
@@ -72,7 +72,7 @@ const BookingFilterModal = ({ show, onClose, filter, setFilter }) => {
   };
 
   return (
-    <Modal show={show} onHide={onClose} size="lg" centered>
+    <Modal show={show} onHide={onHide} size="lg" centered>
       <Modal.Header closeButton className={styles.modalHeader}>
         <Modal.Title>
           <div className={styles.titleContent}>
@@ -267,7 +267,7 @@ const BookingFilterModal = ({ show, onClose, filter, setFilter }) => {
         <Button variant="outline-secondary" onClick={handleClear}>
           🔄 Xóa lọc
         </Button>
-        <Button variant="outline-primary" onClick={onClose}>
+        <Button variant="outline-primary" onClick={onHide}>
           ❌ Hủy
         </Button>
         <Button variant="primary" onClick={handleApply}>

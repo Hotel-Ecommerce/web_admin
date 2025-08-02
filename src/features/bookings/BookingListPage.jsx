@@ -406,7 +406,7 @@ const BookingListPage = () => {
       {/* Modals */}
       <BookingFilterModal 
         show={showFilter} 
-        onClose={() => setShowFilter(false)} 
+        onHide={() => setShowFilter(false)} 
         filter={filter} 
         setFilter={setFilter} 
       />
