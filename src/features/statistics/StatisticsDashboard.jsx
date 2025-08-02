@@ -4,7 +4,8 @@ import { UserContext } from '../../context/UserContext';
 import { 
   getAllStatistics, 
   getRealTimeStatistics,
-  exportStatistics
+  exportStatistics,
+  getAllMockData
 } from './StatisticsAPI';
 import styles from './StatisticsDashboard.module.scss';
 import { getCurrentDate } from '../../utils/dateUtils';
@@ -148,7 +149,13 @@ const StatisticsDashboard = () => {
 
       } catch (error) {
         console.error('Error in statistics dashboard:', error);
-        setError('Có lỗi xảy ra khi tải dữ liệu thống kê. Một số dữ liệu có thể không khả dụng.');
+        // Use mock data if API fails
+        const mockData = getAllMockData();
+        setStats(mockData.comprehensiveStats);
+        setBookingStats(mockData.bookingStats);
+        setRealTimeData(mockData.realTimeStats);
+        setLastUpdated(new Date());
+        setError('Đang sử dụng dữ liệu mẫu. Một số dữ liệu có thể không phản ánh tình trạng thực tế.');
       } finally {
         setLoading(false);
       }

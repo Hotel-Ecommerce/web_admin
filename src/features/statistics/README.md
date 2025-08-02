@@ -4,6 +4,37 @@
 
 Trang thống kê được thiết kế để hoạt động với backend hiện tại. Do backend chỉ có API `/statistics/bookings`, frontend sẽ tính toán các thống kê khác từ dữ liệu booking, rooms, customers và requests.
 
+## Mock Data
+
+Để đảm bảo trang thống kê hoạt động ngay cả khi backend chưa sẵn sàng, chúng tôi đã thêm hệ thống mock data toàn diện:
+
+### Cấu trúc Mock Data
+
+File `mockData.js` chứa tất cả dữ liệu mẫu:
+
+- **Comprehensive Statistics**: Thống kê tổng hợp về booking, revenue, customer, room, requests
+- **Real-time Statistics**: Dữ liệu thời gian thực (hôm nay)
+- **Booking Statistics**: Dữ liệu booking theo ngày (30 ngày gần nhất)
+- **Room Type Statistics**: Thống kê theo loại phòng
+- **Customer Statistics**: Thống kê khách hàng theo tháng
+- **Revenue Trends**: Xu hướng doanh thu theo tuần
+- **Top Rooms**: Danh sách phòng có hiệu suất cao nhất
+- **Payment Statistics**: Thống kê thanh toán và phương thức thanh toán
+- **Cancellation Reasons**: Lý do hủy đặt phòng
+- **Customer Satisfaction**: Đánh giá và xếp hạng của khách hàng
+- **Seasonal Trends**: Xu hướng theo mùa
+
+### Sử dụng Mock Data
+
+Mock data sẽ được sử dụng tự động khi:
+1. API calls fail
+2. Backend chưa sẵn sàng
+3. Testing và development
+
+### Test Component
+
+File `MockDataTest.jsx` cung cấp component để test và xem tất cả mock data có sẵn.
+
 ## Cách hoạt động
 
 ### 1. API Backend có sẵn

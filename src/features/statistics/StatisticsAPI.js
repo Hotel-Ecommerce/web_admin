@@ -6,6 +6,12 @@ import {
   API_URL_CUSTOMERS_LIST,
   API_URL_BOOKING_CHANGE_REQUESTS
 } from '../../core/constant/api_constant';
+import { 
+  mockComprehensiveStats, 
+  mockRealTimeStats, 
+  mockBookingStats,
+  mockStatisticsData 
+} from './mockData';
 
 // Get booking statistics from backend
 export const getBookingStatistics = async (token, filters = {}) => {
@@ -20,20 +26,7 @@ export const getBookingStatistics = async (token, filters = {}) => {
   } catch (error) {
     console.warn(`API call failed for booking statistics (${error.response?.status || 'unknown'}):`, error.message);
     // Return mock data if API fails
-    return [
-      {
-        date: '2024-01-01',
-        totalBookings: 15,
-        confirmedBookings: 12,
-        totalRevenue: 2500000
-      },
-      {
-        date: '2024-01-02',
-        totalBookings: 18,
-        confirmedBookings: 15,
-        totalRevenue: 3000000
-      }
-    ];
+    return mockBookingStats;
   }
 };
 
@@ -274,31 +267,7 @@ export const getComprehensiveStatistics = async (token, filters = {}) => {
     };
   } catch (error) {
     console.warn(`Comprehensive statistics calculation failed:`, error.message);
-    return {
-      booking: {
-        total: 0,
-        confirmed: 0,
-        cancelled: 0,
-        confirmationRate: 0,
-        cancellationRate: 0
-      },
-      revenue: {
-        total: 0,
-        paid: 0,
-        unpaid: 0,
-        averagePerBooking: 0
-      },
-      customer: {
-        newCustomers: 0
-      },
-      room: {
-        total: 0,
-        totalCapacity: 0
-      },
-      requests: {
-        pending: 0
-      }
-    };
+    return mockComprehensiveStats;
   }
 };
 
@@ -342,13 +311,7 @@ export const getRealTimeStatistics = async (token) => {
     };
   } catch (error) {
     console.warn(`Real-time statistics failed:`, error.message);
-    return {
-      todayBookings: 0,
-      todayRevenue: 0,
-      totalRooms: 0,
-      pendingRequests: 0,
-      timestamp: new Date().toISOString()
-    };
+    return mockRealTimeStats;
   }
 };
 
@@ -402,6 +365,16 @@ export const getAllStatistics = async (token, filters = {}) => {
     };
   } catch (error) {
     console.error('Get all statistics failed:', error.message);
-    throw error;
+    // Return mock data if API fails
+    return {
+      bookingStats: mockBookingStats,
+      comprehensiveStats: mockComprehensiveStats,
+      timestamp: new Date().toISOString()
+    };
   }
+};
+
+// Get all mock data for testing and development
+export const getAllMockData = () => {
+  return mockStatisticsData;
 };
