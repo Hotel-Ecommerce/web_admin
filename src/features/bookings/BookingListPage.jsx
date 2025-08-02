@@ -7,7 +7,7 @@ import DeleteBookingModal from './components/DeleteBookingModal/DeleteBookingMod
 import BookingDetailModal from './components/BookingDetailModal/BookingDetailModal';
 
 import { UserContext } from '../../context/UserContext';
-import { getBookings } from './BookingAPI';
+import { getBookings, addBooking } from './BookingAPI';
 import styles from './BookingListPage.module.scss';
 import { 
   FaPlusCircle, 
@@ -436,28 +436,34 @@ const BookingListPage = () => {
         onExport={handleCustomExport}
       />
       <AddBookingModal
-        open={showAdd}
-        onClose={() => setShowAdd(false)}
-        token={token}
-        onAdded={handleReload}
+        show={showAdd}
+        onHide={() => setShowAdd(false)}
+        onAdd={async (data) => {
+          try {
+            await addBooking(data, token);
+            handleReload();
+          } catch (error) {
+            throw error;
+          }
+        }}
       />
       <UpdateBookingModal
-        open={showUpdate}
-        onClose={() => setShowUpdate(false)}
+        show={showUpdate}
+        onHide={() => setShowUpdate(false)}
         booking={selectedBooking}
         token={token}
         onUpdated={handleReload}
       />
       <DeleteBookingModal
-        open={showDelete}
-        onClose={() => setShowDelete(false)}
+        show={showDelete}
+        onHide={() => setShowDelete(false)}
         booking={selectedBooking}
         token={token}
         onDeleted={handleReload}
       />
       <BookingDetailModal
-        open={showDetail}
-        onClose={() => setShowDetail(false)}
+        show={showDetail}
+        onHide={() => setShowDetail(false)}
         booking={selectedBooking}
       />
       

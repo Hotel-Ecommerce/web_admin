@@ -21,7 +21,7 @@ const statusOptions = [
   { value: 'Completed', label: 'Hoàn thành' }
 ];
 
-const UpdateBookingModal = ({ open, onClose, booking, token, onUpdated }) => {
+const UpdateBookingModal = ({ show, onHide, booking, token, onUpdated }) => {
   const [form, setForm] = useState({
     id: '',
     customerId: '',
@@ -41,7 +41,7 @@ const UpdateBookingModal = ({ open, onClose, booking, token, onUpdated }) => {
   const [selectedRoom, setSelectedRoom] = useState(null);
 
   useEffect(() => {
-    if (open && token) {
+    if (show && token) {
       (async () => {
         try {
           const [customerList, roomList] = await Promise.all([
@@ -56,7 +56,7 @@ const UpdateBookingModal = ({ open, onClose, booking, token, onUpdated }) => {
         }
       })();
     }
-  }, [open, token]);
+  }, [show, token]);
 
   useEffect(() => {
     if (booking) {
@@ -165,7 +165,7 @@ const UpdateBookingModal = ({ open, onClose, booking, token, onUpdated }) => {
       if (onUpdated) onUpdated();
       setTimeout(() => {
         setSuccess('');
-        onClose();
+        onHide();
       }, 2000);
     } catch (err) {
       setError(err?.response?.data?.message || 'Có lỗi xảy ra khi cập nhật booking');
@@ -181,7 +181,7 @@ const UpdateBookingModal = ({ open, onClose, booking, token, onUpdated }) => {
   if (!open) return null;
 
   return (
-    <Modal show={open} onHide={onClose} centered size="lg" className={styles['update-booking-modal']}>
+    <Modal show={show} onHide={onHide} centered size="lg" className={styles['update-booking-modal']}>
       <Modal.Header closeButton>
         <Modal.Title>
           <FaCalendarAlt className="me-2" />
@@ -369,7 +369,7 @@ const UpdateBookingModal = ({ open, onClose, booking, token, onUpdated }) => {
           </Alert>
 
           <div className="d-flex justify-content-end gap-2">
-            <Button variant="secondary" onClick={onClose} disabled={loading}>
+            <Button variant="secondary" onClick={onHide} disabled={loading}>
               Hủy
             </Button>
             <Button variant="primary" type="submit" disabled={loading}>

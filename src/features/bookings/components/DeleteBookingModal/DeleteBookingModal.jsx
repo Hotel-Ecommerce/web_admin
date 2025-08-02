@@ -5,11 +5,11 @@ import { deleteBooking } from '../../BookingAPI';
 import styles from './DeleteBookingModal.module.scss';
 import { formatDate } from '../../../../utils/dateUtils';
 
-const DeleteBookingModal = ({ open, onClose, booking, token, onDeleted }) => {
+const DeleteBookingModal = ({ show, onHide, booking, token, onDeleted }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  if (!open || !booking) return null;
+  if (!show || !booking) return null;
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('vi-VN').format(price) + ' ₫';
@@ -58,7 +58,7 @@ const DeleteBookingModal = ({ open, onClose, booking, token, onDeleted }) => {
     try {
       await deleteBooking(booking._id, token);
       if (onDeleted) onDeleted();
-      onClose();
+      onHide();
     } catch (err) {
       setError(err?.response?.data?.message || 'Xóa booking thất bại');
     } finally {
@@ -67,7 +67,7 @@ const DeleteBookingModal = ({ open, onClose, booking, token, onDeleted }) => {
   };
 
   return (
-    <Modal show={open} onHide={onClose} centered className={styles['delete-booking-modal']}>
+    <Modal show={show} onHide={onHide} centered className={styles['delete-booking-modal']}>
       <Modal.Header closeButton>
         <Modal.Title>
           <FaExclamationTriangle className="text-warning me-2" />
